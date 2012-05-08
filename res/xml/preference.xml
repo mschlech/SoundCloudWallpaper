@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <CheckBoxPreference
-        android:key="touch"
-        android:title="Enable Touch" >
-    </CheckBoxPreference>
+    <PreferenceCategory
+        android:key="soundcloudcredentials"
+        android:title="sound cloud network credentials" >
+        <CheckBoxPreference
+            android:key="touch"
+            android:title="Enable Touch" >
+        </CheckBoxPreference>
 
-    <EditTextPreference
-        android:defaultValue="mschlech"
-        android:key="login"
-        android:title="login" >
-    </EditTextPreference>
-    <EditTextPreference
-        android:defaultValue="linus123"
-        android:key="password"
-        android:title="Password" >
-    </EditTextPreference>
-
-    <ListPreference
-        android:defaultValue="tracks"
-        android:dialogMessage="favorites or tracks"
-        android:dialogTitle="source"
-        android:entries="@array/sourceValue"
-        android:entryValues="@array/sourceKey"
-        android:key="source" />
+        <EditTextPreference
+            android:defaultValue="mschlech"
+            android:dialogIcon="@drawable/soundcloudlogo"
+            android:key="login"
+            android:title="login" >
+        </EditTextPreference>
+        <EditTextPreference
+            android:defaultValue="linus123"
+            android:dialogIcon="@drawable/soundcloudlogo"
+            android:key="password"
+            android:title="Password" >
+        </EditTextPreference>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="soundcloudsource"
+        android:title="soundcloud data source" >
+        <ListPreference
+            android:defaultValue="tracks"
+            android:dialogIcon="@drawable/soundcloudlogo"
+            android:dialogMessage="favorites or tracks"
+            android:dialogTitle="source"
+            android:entries="@array/sourceValue"
+            android:entryValues="@array/sourceKey"
+            android:key="source"
+            android:summary="set the source from which sound cloud source to fetch the data"
+            android:title="tracks or favorites" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

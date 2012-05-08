@@ -20,8 +20,12 @@ public final class R {
         public static final int soundcloudlogo=0x7f020002;
         public static final int testwave=0x7f020003;
     }
+    public static final class id {
+        public static final int settings_text_view=0x7f070000;
+    }
     public static final class layout {
         public static final int main=0x7f030000;
+        public static final int preferencelayout=0x7f030001;
     }
     public static final class string {
         public static final int app_name=0x7f060001;

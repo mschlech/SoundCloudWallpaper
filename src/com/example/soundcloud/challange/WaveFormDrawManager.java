@@ -4,14 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
 
 import android.content.Context;
-import android.os.SystemClock;
-import android.database.CursorJoiner.Result;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BlurMaskFilter;
@@ -22,12 +18,10 @@ import android.graphics.LightingColorFilter;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.Shader;
 import android.graphics.Shader.TileMode;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
-import com.example.soundcloud.challange.data.Tracks;
 
 /**
  * 
@@ -38,15 +32,13 @@ public class WaveFormDrawManager {
 
 	private String LOG_TAG = WaveFormDrawManager.class.getSimpleName();
 
-	private String mGenre = "HipHop";
-	private String mTitle = "Hot sauce";
-	private String mPermalinkUrl = "www.google.de";
-
 	private Bitmap mWaveformBitmap;
+	private Bitmap mSoundCloudLogoBitmap;
 
 	private final Paint mTextPaint;
 	private final Paint mRectPaint;
 	private final Paint mWaveFormPaint;
+	private final Paint mSoundCloudLogoPaint;
 
 	private int mCenterY;
 	private int mCenterX;
@@ -62,6 +54,8 @@ public class WaveFormDrawManager {
 	private final static float[] POSITIONS = { 0, 0.5f, 1 };
 
 	private URL mUrl;
+
+	private Context mContext;
 
 	/**
 	 * default constructor defining the style static initializer
@@ -83,10 +77,13 @@ public class WaveFormDrawManager {
 				1, 1, 1, 1, 1 // alpha
 		};
 
+		/**
+		 * optional task to display the trackname / url on the homescreen
+		 */
 		mTextPaint = new Paint() {
 			{
 				setTextSize(30f);
-				setColor(Color.rgb(255,255,240));
+				setColor(Color.rgb(255, 255, 240));
 				setMaskFilter(new BlurMaskFilter(3, Blur.SOLID));
 			}
 
@@ -107,6 +104,12 @@ public class WaveFormDrawManager {
 
 		};
 
+		mSoundCloudLogoPaint = new Paint() {
+			{
+				setAntiAlias(true);
+			}
+		};
+
 		mRectPaint = new Paint() {
 			{
 				setStyle(Style.FILL);
@@ -125,6 +128,7 @@ public class WaveFormDrawManager {
 	public void onCreate(final Context context, String waveformUrl) {
 
 		Log.i(LOG_TAG, " onCreate in WaveFormDrawManager " + waveformUrl);
+		mContext = context;
 		WindowManager windowManager = (WindowManager) context
 				.getSystemService(Context.WINDOW_SERVICE);
 		DisplayMetrics metrics = new DisplayMetrics();
@@ -135,9 +139,8 @@ public class WaveFormDrawManager {
 		mDensity = metrics.density;
 
 		mWaveformBitmap = getBitmapFromSoundCloud(waveformUrl);
-		// mWaveformBitmap =
-		// BitmapFactory.decodeResource(context.getResources(),
-		// R.drawable.testwave);
+		mSoundCloudLogoBitmap = BitmapFactory.decodeResource(
+				context.getResources(), R.drawable.soundcloudlogo);
 
 	}
 
@@ -196,7 +199,10 @@ public class WaveFormDrawManager {
 		c.drawRect(mRect, mRectPaint);
 
 		c.drawBitmap(mWaveformBitmap, 0, 0, mWaveFormPaint);
-
+		/**
+		 * @TODO resize the image to the appropriate position via onSizedChanged
+		 */
+		c.drawBitmap(mSoundCloudLogoBitmap, 100, 100, mSoundCloudLogoPaint);
 		/**
 		 * moving the backround not the object
 		 */
@@ -212,20 +218,25 @@ public class WaveFormDrawManager {
 		/**
 		 * rotate and flying text
 		 */
-//		long et = SystemClock.elapsedRealtime();
-//		float mXrotation = ((float) (et - TIME_OFFSET)) / 1000;
-//		float mYrotation = ((float) (0.5f - mCenterY) * 2.0f);
-//		float newY = (float) (Math.sin(mXrotation) * (mCenterX) + Math
-//				.cos(mXrotation) * (mCenterY));
-//
-//		float newZ = (float) (Math.cos(mXrotation) * mCenterX - Math
-//				.sin(mXrotation) * mCenterY);
-//
-//		 float newX = (float)(Math.sin(mYrotation) * newZ + Math.cos(mYrotation) * mXrotation);
-//         newZ = (float)(Math.cos(mYrotation) * newZ - Math.sin(mYrotation) * mXrotation);
+		// long et = SystemClock.elapsedRealtime();
+		// float mXrotation = ((float) (et - TIME_OFFSET)) / 1000;
+		// float mYrotation = ((float) (0.5f - mCenterY) * 2.0f);
+		// float newY = (float) (Math.sin(mXrotation) * (mCenterX) + Math
+		// .cos(mXrotation) * (mCenterY));
+		//
+		// float newZ = (float) (Math.cos(mXrotation) * mCenterX - Math
+		// .sin(mXrotation) * mCenterY);
+		//
+		// float newX = (float)(Math.sin(mYrotation) * newZ +
+		// Math.cos(mYrotation) * mXrotation);
+		// newZ = (float)(Math.cos(mYrotation) * newZ - Math.sin(mYrotation) *
+		// mXrotation);
 
-		int x = (int) ((int) (300) + (Math.sin(time)+1 ) *8);
-		int y = (int) ((int) (400) + (Math.sin(time)+1 ) *8);
+		/**
+		 * optional task to display the trackname / url on the homescreen
+		 */
+		int x = (int) ((int) (300) + (Math.sin(time) + 1) * 2);
+		int y = (int) ((int) (400) + (Math.sin(time) + 1) * 2);
 		Rect rect = new Rect();
 		mTextPaint.getTextBounds(genre, 0, genre.length(), rect);
 		c.translate(x, y);
@@ -234,6 +245,7 @@ public class WaveFormDrawManager {
 		c.translate(-x, -y);
 		c.rotate(-45, x + rect.exactCenterX(), y + rect.exactCenterY());
 		mTextPaint.setStyle(Paint.Style.FILL);
+		mTextPaint.setFakeBoldText(true);
 		c.drawText(genre, x, y, mTextPaint);
 
 		c.drawText(genre, 100, 100, mTextPaint);
@@ -247,9 +259,12 @@ public class WaveFormDrawManager {
 	 *       memory
 	 */
 	public void onDestroy() {
-		if (mWaveformBitmap != null) {
+		if (mWaveformBitmap != null && mSoundCloudLogoBitmap != null) {
 			mWaveformBitmap.recycle();
+			mSoundCloudLogoBitmap.recycle();
+
 			mWaveformBitmap = null;
+			mSoundCloudLogoBitmap = null;
 		}
 
 	}
@@ -288,10 +303,13 @@ public class WaveFormDrawManager {
 	 * @param result
 	 */
 	public void setBitmap(Bitmap result) {
-		if (mWaveformBitmap != null) {
+		if (mWaveformBitmap != null && mSoundCloudLogoBitmap != null) {
+			mSoundCloudLogoBitmap.recycle();
 			mWaveformBitmap.recycle();
 
 		}
+		mSoundCloudLogoBitmap = BitmapFactory.decodeResource(
+				mContext.getResources(), R.drawable.soundcloudlogo);
 		mWaveformBitmap = result;
 	}
 }

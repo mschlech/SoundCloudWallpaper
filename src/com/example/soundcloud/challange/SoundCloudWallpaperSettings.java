@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 /**
@@ -21,20 +22,39 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preference);
-
+		
+		
 		Preference loginPreference = getPreferenceScreen().findPreference(
 				"login");
 
 		Preference passwordPreference = getPreferenceScreen().findPreference(
 				"password");
 		
-		Preference source = getPreferenceScreen().findPreference("source");
 
 		// Add the validator and listener on certain preferences
 		loginPreference.setOnPreferenceChangeListener(loginCheckListener);
 		passwordPreference.setOnPreferenceChangeListener(passwordChecker);
-		source.setOnPreferenceChangeListener(sourceListener);
 	}
+	
+	
+
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		// TODO Auto-generated method stub
+		return super.onMenuItemSelected(featureId, item);
+	}
+
+
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Preference source = getPreferenceScreen().findPreference("source");
+
+		source.setOnPreferenceChangeListener(sourceListener);
+		return super.onOptionsItemSelected(item);
+	}
+
+
 
 	@Override
 	protected void onResume() {

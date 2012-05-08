@@ -7,11 +7,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
+import android.net.Uri;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +21,9 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnDoubleTapListener;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
@@ -62,7 +67,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 	}
 
 	class SoundCloudWallpaperEngine extends Engine implements
-			SharedPreferences.OnSharedPreferenceChangeListener {
+			SharedPreferences.OnSharedPreferenceChangeListener,
+			OnGestureListener {
 
 		private SharedPreferences mPrefs = PreferenceManager
 				.getDefaultSharedPreferences(SoundCloudLiveWallpaperService.this);
@@ -83,6 +89,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		private List<Tracks> tracks = null;
 
 		SoundCloudApi mApiWrapper;
+
+		private GestureDetector mGestureDetector;
 
 		private int run = 0;
 
@@ -111,13 +119,13 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			// Reschedule the next redraw
 			mHandler.removeCallbacks(mDrawWaveFrameRunnable);
 			if (mVisible) {
-				//Log.i(LOG_TAG, "mVisible = " + mVisible);
+				// Log.i(LOG_TAG, "mVisible = " + mVisible);
 				mHandler.postDelayed(mDrawWaveFrameRunnable, 1000 / 25);
 			}
 		}
 
 		private void drawFrame(final Canvas c) {
-			//Log.i(LOG_TAG, " drawFrame invoked" + run);
+			// Log.i(LOG_TAG, " drawFrame invoked" + run);
 			// content
 			mDrawManager.onDraw(c, tracks.get(run).genre,
 					tracks.get(run).trackName, tracks.get(run).permalink_url);
@@ -125,7 +133,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		private final Runnable mDrawWaveFrameRunnable = new Runnable() {
 			public void run() {
-				//Log.i(LOG_TAG, " mDrawWaveFrameRunnable thread invoked");
+				// Log.i(LOG_TAG, " mDrawWaveFrameRunnable thread invoked");
 
 				drawWavePic();
 			}
@@ -167,6 +175,9 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			return super.onCommand(action, x, y, z, extras, resultRequested);
 		}
 
+		/**
+		 * 
+		 */
 		@Override
 		public void onCreate(SurfaceHolder surfaceHolder) {
 			super.onCreate(surfaceHolder);
@@ -193,6 +204,52 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 				mDrawManager.onCreate(getApplicationContext(), "defaultImage");
 			}
+			
+			/**
+			 * optional task to open the browser or the installed soundcloud app
+			 * and invoke the permalink_url
+			 */
+			mGestureDetector = new GestureDetector(this);
+
+			mGestureDetector.setOnDoubleTapListener(new OnDoubleTapListener() {
+
+				@Override
+				public boolean onDoubleTap(MotionEvent e) {
+					String soundCloudUrl = tracks.get(run).permalink_url;
+					Intent soundCloudBrowser = new Intent(Intent.ACTION_VIEW);
+					soundCloudBrowser.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+					soundCloudBrowser.setData(Uri.parse(soundCloudUrl));
+					run = 0;
+					startActivity(soundCloudBrowser);
+
+					return false;
+				}
+
+				@Override
+				public boolean onDoubleTapEvent(MotionEvent e) {
+					// if the second tap hadn't been released and it's being
+					// moved
+					if (e.getAction() == MotionEvent.ACTION_MOVE) {
+						Log.i(LOG_TAG,
+								" could invoke something else because a movement on the second tab");
+					} else if (e.getAction() == MotionEvent.ACTION_UP)// user
+																		// released
+																		// the
+																		// screen
+					{
+					}
+					return false;
+				}
+
+				@Override
+				public boolean onSingleTapConfirmed(MotionEvent e) {
+					Log.i(LOG_TAG,
+							"could invoke something else on one tab because double tab was not proper");
+					return false;
+				}
+			});
+
 		}
 
 		@Override
@@ -263,6 +320,50 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		public void onTouchEvent(MotionEvent event) {
 
 			super.onTouchEvent(event);
+			Log.i(LOG_TAG, "on touch -> " + event);
+			mGestureDetector.onTouchEvent(event);
+		}
+
+		/**
+		 * the OnGestureListener Events to get the double tap feature
+		 */
+
+		@Override
+		public boolean onDown(MotionEvent arg0) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+				float velocityY) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public void onLongPress(MotionEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public boolean onScroll(MotionEvent e1, MotionEvent e2,
+				float distanceX, float distanceY) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public void onShowPress(MotionEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public boolean onSingleTapUp(MotionEvent e) {
+			// TODO Auto-generated method stub
+			return false;
 		}
 
 		@Override
