@@ -25,7 +25,15 @@
     <PreferenceCategory
         android:key="soundcloudsource"
         android:title="soundcloud data source" >
-        <ListPreference
+        <EditTextPreference
+            android:defaultValue="tracks"
+            android:dialogIcon="@drawable/soundcloudlogo"
+            android:key="source"
+            android:summary="set the resource name from which sound cloud resource to fetch the data"
+            android:title="resource name of sound cloud" >
+        </EditTextPreference>
+        <!--
+             <ListPreference
             android:defaultValue="tracks"
             android:dialogIcon="@drawable/soundcloudlogo"
             android:dialogMessage="favorites or tracks"
@@ -33,8 +41,9 @@
             android:entries="@array/sourceValue"
             android:entryValues="@array/sourceKey"
             android:key="source"
-            android:summary="set the source from which sound cloud source to fetch the data"
+            android:summary="set the resource name from which sound cloud resource to fetch the data"
             android:title="tracks or favorites" />
+        -->
     </PreferenceCategory>
 
 </PreferenceScreen>

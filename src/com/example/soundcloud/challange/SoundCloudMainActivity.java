@@ -23,12 +23,12 @@ import com.example.soundcloud.challange.data.Tracks;
 	    public void onCreate(Bundle savedInstanceState) {
 	        super.onCreate(savedInstanceState);
 	        setContentView(R.layout.main);
-	        SoundCloudApi sca = new SoundCloudApi("mschlech","linus123");
+	        SoundCloudApi sca = new SoundCloudApi("mschlech","linus123" , "tracks");
 	        try {
 	            Log.d(LOG_TAG, " fetching some souncloud stuff upfront");
 	            //String myId = ReadingStoriesAloudAuthService.getMyId();
 	            //Log.i(LOG_TAG, "ID in soundloud main " + myId);
-	            List<Tracks> tracks  = sca.getMyWaveformUrl("tracks", sca.getApiWrapper());
+	            List<Tracks> tracks  = sca.getMyWaveformUrl( sca.getApiWrapper());
 	            for(Tracks tracks1 : tracks) {
 	                Log.i(LOG_TAG, "++++++ Tracks wave url ++++ " + tracks1.waveformUrl  );
 	            }

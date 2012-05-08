@@ -34,6 +34,7 @@ public class SoundCloudApi {
 	// private static String passwd = "linus123";
 	static String mUsername;
 	static String mPassword;
+	static String mSource;
 
 	final String END_USER_AUTHORIZATON_URL = "https://soundcloud.com/connect";
 	final String TOKEN = "https://api.soundcloud.com/oauth2/token";
@@ -47,11 +48,12 @@ public class SoundCloudApi {
 	AccountManager mAccountManager;
 	Account mAccount;
 
-	public SoundCloudApi(String aUsername, String aPassword) {
+	public SoundCloudApi(String aUsername, String aPassword, String source) {
 		Log.i(LOG_TAG, "User " + aUsername + " password " + aPassword);
 
 		mUsername = aUsername;
 		mPassword = aPassword;
+		mSource = source;
 	}
 
 	/**
@@ -202,7 +204,7 @@ public class SoundCloudApi {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<Tracks> getMyWaveformUrl(String source,
+	public static List<Tracks> getMyWaveformUrl(
 			ApiWrapper apiWrapper) throws Exception {
 
 		// ApiWrapper apiWrapper = getApiWrapper();
@@ -213,7 +215,7 @@ public class SoundCloudApi {
 		resourceUrl.append("/users/");
 		resourceUrl.append(id);
 		resourceUrl.append("/");
-		resourceUrl.append(source);
+		resourceUrl.append(mSource.trim());
 
 		final Request requestResource = Request.to(resourceUrl.toString());
 

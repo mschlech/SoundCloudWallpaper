@@ -46,6 +46,9 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 	private AndroidHttpClient ahc;
 
+	private int run = 0;
+
+
 	/**
 	 * a good idea to persist the png in the local filesystem
 	 */
@@ -63,6 +66,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		run=0;
 		return new SoundCloudWallpaperEngine();
 	}
 
@@ -78,7 +82,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		private String soundCloudPassword = mPrefs.getString("password",
 				"linus123");
 
-		private String soundCloudSource = mPrefs.getString("source", "tracks");
+		private String soundCloudSource = mPrefs.getString("source", "favorites");
 
 		private TrackListLoader mTrackListLoader;
 
@@ -92,16 +96,15 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		private GestureDetector mGestureDetector;
 
-		private int run = 0;
 
 		SoundCloudWallpaperEngine() {
-			mApiWrapper = new SoundCloudApi(soundCloudUser, soundCloudPassword);
+			mApiWrapper = new SoundCloudApi(soundCloudUser, soundCloudPassword, soundCloudSource);
 			mPrefs.registerOnSharedPreferenceChangeListener(this);
 			onSharedPreferenceChanged(mPrefs, null);
 		}
 
 		void drawWavePic() {
-			Log.i(LOG_TAG, " drawPic invoked");
+			Log.i(LOG_TAG, " drawPic invoked" + run);
 			final SurfaceHolder holder = getSurfaceHolder();
 
 			Canvas c = null;
@@ -197,7 +200,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				// Log.i(LOG_TAG, "in onCreate tracks to pass = " + tracks);
 				mDrawManager.onCreate(getApplicationContext(),
 						tracks.get(run).waveformUrl);
-				run = run <= tracks.size() ? run = +1 : 0;
+				//run = run <= tracks.size() ? run = +1 : 0;
 				// Log.i(LOG_TAG, "next run " + run);
 			} else {
 				// Log.i(LOG_TAG, "no text from network");
@@ -270,6 +273,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				mTrackListLoader.cancel(true);
 			}
 			isDestroyed = true;
+			run=0;
 			mHandler.removeCallbacks(mDrawWaveFrameRunnable);
 		}
 
@@ -431,7 +435,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		protected List<Tracks> doInBackground(Void... params) {
 			try {
 				Log.i(LOG_TAG, "loading the track information");
-				return SoundCloudApi.getMyWaveformUrl("tracks", mApiWrapper);
+				return SoundCloudApi.getMyWaveformUrl(mApiWrapper);
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.getMessage());
 			}

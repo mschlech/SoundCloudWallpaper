@@ -6,13 +6,12 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 /**
  * 
  * @author marcus
- *
+ * 
  */
 public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
@@ -22,39 +21,21 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preference);
-		
-		
+
 		Preference loginPreference = getPreferenceScreen().findPreference(
 				"login");
 
 		Preference passwordPreference = getPreferenceScreen().findPreference(
 				"password");
-		
+		Preference source = getPreferenceScreen().findPreference("source");
 
 		// Add the validator and listener on certain preferences
 		loginPreference.setOnPreferenceChangeListener(loginCheckListener);
 		passwordPreference.setOnPreferenceChangeListener(passwordChecker);
-	}
-	
-	
-
-	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		// TODO Auto-generated method stub
-		return super.onMenuItemSelected(featureId, item);
-	}
-
-
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		Preference source = getPreferenceScreen().findPreference("source");
-
 		source.setOnPreferenceChangeListener(sourceListener);
-		return super.onOptionsItemSelected(item);
 	}
 
-
+	
 
 	@Override
 	protected void onResume() {
@@ -101,13 +82,16 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 		}
 
 	};
-	
+
 	Preference.OnPreferenceChangeListener sourceListener = new OnPreferenceChangeListener() {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			// If now create a message to the user
-			Toast.makeText(SoundCloudWallpaperSettings.this, "You choose " + newValue.toString(),
-					Toast.LENGTH_SHORT).show();
+			if (newValue != null && newValue.toString().length() > 0) {
+				return true;
+			}
+			Toast.makeText(SoundCloudWallpaperSettings.this,
+					"You choose " + newValue.toString(), Toast.LENGTH_SHORT)
+					.show();
 			return false;
 		}
 
