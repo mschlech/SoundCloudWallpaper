@@ -6,6 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Random;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +19,7 @@ import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
@@ -104,7 +106,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		}
 
 		void drawWavePic() {
-			Log.i(LOG_TAG, " drawPic invoked" + run);
+			//Log.i(LOG_TAG, " drawPic invoked" + run);
 			final SurfaceHolder holder = getSurfaceHolder();
 
 			Canvas c = null;
@@ -130,10 +132,30 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		private void drawFrame(final Canvas c) {
 			// Log.i(LOG_TAG, " drawFrame invoked" + run);
 			// content
+			long currentTime=SystemClock.currentThreadTimeMillis();
+			run = getRandomRun(currentTime);
+			
+			Log.i(LOG_TAG,"run " +currentTime);
 			mDrawManager.onDraw(c, tracks.get(run).genre,
 					tracks.get(run).trackName, tracks.get(run).permalink_url);
 		}
 
+		/**
+		 * task get a random run so a random waveform from the soundcloud resource
+		 * @return integer 
+		 */
+		int getRandomRun(long timeOffset) {
+			
+			Random randomWavForm = new Random();
+			int max = tracks.size()-1;
+			int min = 0;
+			run = (randomWavForm.nextInt(max-min + 1) +min);
+			return run;
+		}
+		
+		/**
+		 * 
+		 */
 		private final Runnable mDrawWaveFrameRunnable = new Runnable() {
 			public void run() {
 				// Log.i(LOG_TAG, " mDrawWaveFrameRunnable thread invoked");
@@ -249,6 +271,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				public boolean onSingleTapConfirmed(MotionEvent e) {
 					Log.i(LOG_TAG,
 							"could invoke something else on one tab because double tab was not proper");
+					run=+1;
+					
 					return false;
 				}
 			});
@@ -325,6 +349,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 			super.onTouchEvent(event);
 			Log.i(LOG_TAG, "on touch -> " + event);
+			
 			mGestureDetector.onTouchEvent(event);
 		}
 

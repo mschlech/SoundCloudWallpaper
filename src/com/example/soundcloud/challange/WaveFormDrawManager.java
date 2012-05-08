@@ -187,8 +187,8 @@ public class WaveFormDrawManager {
 	 */
 	public void onDraw(final Canvas c, String genre, String title,
 			String permalink_url) {
-		Log.i(LOG_TAG, "genre = " + genre + " title " + title
-				+ " permalink_url " + permalink_url);
+//		Log.i(LOG_TAG, "genre = " + genre + " title " + title
+//				+ " permalink_url " + permalink_url);
 
 		c.drawColor(Color.BLACK);
 		final int translateY = mCenterY - mWaveformBitmap.getHeight() / 2;
