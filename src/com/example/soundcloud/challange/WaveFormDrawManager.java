@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.List;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.database.CursorJoiner.Result;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,7 +32,7 @@ import com.example.soundcloud.challange.data.Tracks;
 /**
  * 
  * @author marcus
- *
+ * 
  */
 public class WaveFormDrawManager {
 
@@ -56,7 +57,8 @@ public class WaveFormDrawManager {
 
 	private float mDensity = 1;
 
-	private final static int[] COLORS = { 0, Color.WHITE, Color.BLACK };
+	private final static int[] COLORS = { 0, Color.rgb(255, 127, 0),
+			Color.rgb(247, 247, 247) };
 	private final static float[] POSITIONS = { 0, 0.5f, 1 };
 
 	private URL mUrl;
@@ -84,7 +86,7 @@ public class WaveFormDrawManager {
 		mTextPaint = new Paint() {
 			{
 				setTextSize(30f);
-				setColor(Color.WHITE);
+				setColor(Color.rgb(255,255,240));
 				setMaskFilter(new BlurMaskFilter(3, Blur.SOLID));
 			}
 
@@ -132,7 +134,6 @@ public class WaveFormDrawManager {
 		 */
 		mDensity = metrics.density;
 
-		
 		mWaveformBitmap = getBitmapFromSoundCloud(waveformUrl);
 		// mWaveformBitmap =
 		// BitmapFactory.decodeResource(context.getResources(),
@@ -207,6 +208,33 @@ public class WaveFormDrawManager {
 		final double time = System.currentTimeMillis() - TIME_OFFSET;
 		final double scale = (Math.sin(time) + 1) * 8 * mDensity;
 		mTextPaint.setMaskFilter(new BlurMaskFilter((float) scale, Blur.SOLID));
+
+		/**
+		 * rotate and flying text
+		 */
+//		long et = SystemClock.elapsedRealtime();
+//		float mXrotation = ((float) (et - TIME_OFFSET)) / 1000;
+//		float mYrotation = ((float) (0.5f - mCenterY) * 2.0f);
+//		float newY = (float) (Math.sin(mXrotation) * (mCenterX) + Math
+//				.cos(mXrotation) * (mCenterY));
+//
+//		float newZ = (float) (Math.cos(mXrotation) * mCenterX - Math
+//				.sin(mXrotation) * mCenterY);
+//
+//		 float newX = (float)(Math.sin(mYrotation) * newZ + Math.cos(mYrotation) * mXrotation);
+//         newZ = (float)(Math.cos(mYrotation) * newZ - Math.sin(mYrotation) * mXrotation);
+
+		int x = (int) ((int) (300) + (Math.sin(time)+1 ) *8);
+		int y = (int) ((int) (400) + (Math.sin(time)+1 ) *8);
+		Rect rect = new Rect();
+		mTextPaint.getTextBounds(genre, 0, genre.length(), rect);
+		c.translate(x, y);
+		mTextPaint.setStyle(Paint.Style.FILL);
+
+		c.translate(-x, -y);
+		c.rotate(-45, x + rect.exactCenterX(), y + rect.exactCenterY());
+		mTextPaint.setStyle(Paint.Style.FILL);
+		c.drawText(genre, x, y, mTextPaint);
 
 		c.drawText(genre, 100, 100, mTextPaint);
 		c.drawText(title, 140, 140, mTextPaint);
