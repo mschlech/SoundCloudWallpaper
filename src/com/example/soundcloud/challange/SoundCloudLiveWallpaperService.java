@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.List;
 
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -27,11 +26,10 @@ import com.example.soundcloud.challange.api.SoundCloudApi;
 import com.example.soundcloud.challange.data.Tracks;
 import com.soundcloud.api.ApiWrapper;
 
-
 /**
  * 
  * @author marcus
- *
+ * 
  */
 public class SoundCloudLiveWallpaperService extends WallpaperService {
 
@@ -42,8 +40,6 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 	private boolean isDestroyed = false;
 
 	private AndroidHttpClient ahc;
-
-	
 
 	/**
 	 * a good idea to persist the png in the local filesystem
@@ -68,16 +64,16 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 	class SoundCloudWallpaperEngine extends Engine implements
 			SharedPreferences.OnSharedPreferenceChangeListener {
 
-			
 		private SharedPreferences mPrefs = PreferenceManager
 				.getDefaultSharedPreferences(SoundCloudLiveWallpaperService.this);
-		
+
 		private String soundCloudUser = mPrefs.getString("login", "mschlech");
-		
-		private String soundCloudPassword = mPrefs.getString("password", "linus123");
-		
+
+		private String soundCloudPassword = mPrefs.getString("password",
+				"linus123");
+
 		private String soundCloudSource = mPrefs.getString("source", "tracks");
-		
+
 		private TrackListLoader mTrackListLoader;
 
 		private boolean mVisible;
@@ -85,17 +81,17 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		private WaveFormDrawManager mDrawManager = new WaveFormDrawManager();
 
 		private List<Tracks> tracks = null;
-		
-		SoundCloudApi mApiWrapper ;
-		
+
+		SoundCloudApi mApiWrapper;
+
 		private int run = 0;
 
-		 SoundCloudWallpaperEngine() {
+		SoundCloudWallpaperEngine() {
 			mApiWrapper = new SoundCloudApi(soundCloudUser, soundCloudPassword);
 			mPrefs.registerOnSharedPreferenceChangeListener(this);
 			onSharedPreferenceChanged(mPrefs, null);
 		}
-		
+
 		void drawWavePic() {
 			Log.i(LOG_TAG, " drawPic invoked");
 			final SurfaceHolder holder = getSurfaceHolder();
@@ -115,13 +111,13 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			// Reschedule the next redraw
 			mHandler.removeCallbacks(mDrawWaveFrameRunnable);
 			if (mVisible) {
-				Log.i(LOG_TAG, "mVisible = " + mVisible);
+				//Log.i(LOG_TAG, "mVisible = " + mVisible);
 				mHandler.postDelayed(mDrawWaveFrameRunnable, 1000 / 25);
 			}
 		}
 
 		private void drawFrame(final Canvas c) {
-			Log.i(LOG_TAG, " drawFrame invoked" + run);
+			//Log.i(LOG_TAG, " drawFrame invoked" + run);
 			// content
 			mDrawManager.onDraw(c, tracks.get(run).genre,
 					tracks.get(run).trackName, tracks.get(run).permalink_url);
@@ -129,7 +125,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		private final Runnable mDrawWaveFrameRunnable = new Runnable() {
 			public void run() {
-				Log.i(LOG_TAG, " mDrawWaveFrameRunnable thread invoked");
+				//Log.i(LOG_TAG, " mDrawWaveFrameRunnable thread invoked");
 
 				drawWavePic();
 			}
@@ -153,7 +149,6 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		@Override
 		public boolean isPreview() {
-			// TODO Auto-generated method stub
 			return super.isPreview();
 		}
 
@@ -176,25 +171,25 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		public void onCreate(SurfaceHolder surfaceHolder) {
 			super.onCreate(surfaceHolder);
 			// Log.i(LOG_TAG, "onCreate in Engine invoked run " + run);
-            setTouchEventsEnabled(true);
+			setTouchEventsEnabled(true);
 
 			try {
 				Log.i(LOG_TAG, "get tracks object");
 				tracks = new TrackListLoader(mDrawManager,
 						mApiWrapper.getApiWrapper()).doInBackground();
-			//	Log.i(LOG_TAG, "tracks in onCreate with the SurfaceHolder"
-			//			+ tracks.toString());
+				// Log.i(LOG_TAG, "tracks in onCreate with the SurfaceHolder"
+				// + tracks.toString());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			if (tracks != null) {
-			//	Log.i(LOG_TAG, "in onCreate tracks to pass = " + tracks);
+				// Log.i(LOG_TAG, "in onCreate tracks to pass = " + tracks);
 				mDrawManager.onCreate(getApplicationContext(),
 						tracks.get(run).waveformUrl);
 				run = run <= tracks.size() ? run = +1 : 0;
-				//Log.i(LOG_TAG, "next run " + run);
+				// Log.i(LOG_TAG, "next run " + run);
 			} else {
-				//Log.i(LOG_TAG, "no text from network");
+				// Log.i(LOG_TAG, "no text from network");
 
 				mDrawManager.onCreate(getApplicationContext(), "defaultImage");
 			}
@@ -228,7 +223,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			// TODO Auto-generated method stub
 			super.onOffsetsChanged(xOffset, yOffset, xOffsetStep, yOffsetStep,
 					xPixelOffset, yPixelOffset);
-			//Log.i(LOG_TAG, "onOffsetsChanged and drawWavePic to be invoked");
+			// Log.i(LOG_TAG, "onOffsetsChanged and drawWavePic to be invoked");
 
 			drawWavePic();
 		}
@@ -301,14 +296,13 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			/**
 			 * which service to fetch user tracks or user favorites
 			 */
-			soundCloudUser = sharedPreferences.getString("login",
-					"mschlech123");
+			soundCloudUser = sharedPreferences
+					.getString("login", "mschlech123");
 			soundCloudPassword = sharedPreferences.getString("password",
 					"linus123");
-			soundCloudSource = sharedPreferences.getString("source",
-					"tracks");
-			
-			
+			soundCloudSource = sharedPreferences.getString("source", "tracks");
+
+			run = 0;
 		}
 
 	}
