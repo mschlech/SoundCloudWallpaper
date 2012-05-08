@@ -1,6 +1,16 @@
 package com.example.soundcloud.challange;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+
 import android.content.Context;
+import android.database.CursorJoiner.Result;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BlurMaskFilter;
@@ -16,7 +26,13 @@ import android.graphics.Shader.TileMode;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
+import com.example.soundcloud.challange.data.Tracks;
 
+/**
+ * 
+ * @author marcus
+ *
+ */
 public class WaveFormDrawManager {
 
 	private String LOG_TAG = WaveFormDrawManager.class.getSimpleName();
@@ -43,10 +59,13 @@ public class WaveFormDrawManager {
 	private final static int[] COLORS = { 0, Color.WHITE, Color.BLACK };
 	private final static float[] POSITIONS = { 0, 0.5f, 1 };
 
+	private URL mUrl;
+
 	/**
 	 * default constructor defining the style static initializer
 	 */
 	public WaveFormDrawManager() {
+
 		/*
 		 * The matrix is stored in a single array, and its treated as follows: [
 		 * a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t ] When
@@ -64,7 +83,7 @@ public class WaveFormDrawManager {
 
 		mTextPaint = new Paint() {
 			{
-				setTextSize(50f);
+				setTextSize(30f);
 				setColor(Color.WHITE);
 				setMaskFilter(new BlurMaskFilter(3, Blur.SOLID));
 			}
@@ -95,25 +114,81 @@ public class WaveFormDrawManager {
 
 	}
 
-	public void onCreate(final Context context) {
+	/**
+	 * 
+	 * @param context
+	 * @throws URISyntaxException
+	 * @throws MalformedURLException
+	 */
+	public void onCreate(final Context context, String waveformUrl) {
 
+		Log.i(LOG_TAG, " onCreate in WaveFormDrawManager " + waveformUrl);
 		WindowManager windowManager = (WindowManager) context
 				.getSystemService(Context.WINDOW_SERVICE);
 		DisplayMetrics metrics = new DisplayMetrics();
 		windowManager.getDefaultDisplay().getMetrics(metrics);
 		/**
-		 * for high or low dpi device 
+		 * for high or low dpi device
 		 */
 		mDensity = metrics.density;
-		mWaveformBitmap = BitmapFactory.decodeResource(context.getResources(),
-				R.drawable.testwave);
+
+		
+		mWaveformBitmap = getBitmapFromSoundCloud(waveformUrl);
+		// mWaveformBitmap =
+		// BitmapFactory.decodeResource(context.getResources(),
+		// R.drawable.testwave);
 
 	}
 
-	public void onDraw(final Canvas c) {
+	/**
+	 * 
+	 * @param uri
+	 * @return
+	 */
+	private Bitmap getBitmapFromSoundCloud(String url) {
+		try {
+			mUrl = new URL(url);
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} finally {
+
+		}
+		Bitmap result = null;
+		if (url != null) {
+			HttpURLConnection connection;
+			try {
+				Log.i(LOG_TAG, " Bitmap fetch ");
+				connection = (HttpURLConnection) mUrl.openConnection();
+				connection.setDoInput(true);
+				connection.connect();
+				InputStream input = connection.getInputStream();
+				result = BitmapFactory.decodeStream(input);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		Log.i(LOG_TAG, "result");
+
+		return result;
+
+	}
+
+	/**
+	 * 
+	 * @param c
+	 *            a Canvas to draw on
+	 */
+	public void onDraw(final Canvas c, String genre, String title,
+			String permalink_url) {
+		Log.i(LOG_TAG, "genre = " + genre + " title " + title
+				+ " permalink_url " + permalink_url);
+
 		c.drawColor(Color.BLACK);
 		final int translateY = mCenterY - mWaveformBitmap.getHeight() / 2;
-		Log.i(LOG_TAG, "TRANSLATE Y = " + translateY);
+		// Log.i(LOG_TAG, "TRANSLATE Y = " + translateY);
 		c.save();
 
 		c.translate(0, translateY);
@@ -131,11 +206,11 @@ public class WaveFormDrawManager {
 		 */
 		final double time = System.currentTimeMillis() - TIME_OFFSET;
 		final double scale = (Math.sin(time) + 1) * 8 * mDensity;
-		mTextPaint.setMaskFilter(new BlurMaskFilter((float)scale, Blur.SOLID));
+		mTextPaint.setMaskFilter(new BlurMaskFilter((float) scale, Blur.SOLID));
 
-		c.drawText(mTitle, 100, 100, mTextPaint);
-		c.drawText(mGenre, 140, 140, mTextPaint);
-		c.drawText(mTitle, 180, 180, mTextPaint);
+		c.drawText(genre, 100, 100, mTextPaint);
+		c.drawText(title, 140, 140, mTextPaint);
+		c.drawText(permalink_url, 180, 180, mTextPaint);
 
 	}
 
@@ -151,6 +226,12 @@ public class WaveFormDrawManager {
 
 	}
 
+	/**
+	 * some visual effects to manipulate the image
+	 * 
+	 * @param width
+	 * @param height
+	 */
 	public void onSizedChanged(final int width, final int height) {
 		mCenterY = height / 2;
 		if (mWaveformBitmap != null) {
@@ -172,5 +253,17 @@ public class WaveFormDrawManager {
 			Log.w(LOG_TAG, " forgot to call onCreate Bitmap is "
 					+ mWaveformBitmap);
 		}
+	}
+
+	/**
+	 * 
+	 * @param result
+	 */
+	public void setBitmap(Bitmap result) {
+		if (mWaveformBitmap != null) {
+			mWaveformBitmap.recycle();
+
+		}
+		mWaveformBitmap = result;
 	}
 }

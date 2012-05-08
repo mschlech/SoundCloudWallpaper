@@ -7,15 +7,16 @@
     <uses-sdk android:minSdkVersion="10" />
 
     <uses-feature android:name="android.software.live_wallpaper" />
-    
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-    
-    
+
     <application>
-    <!--     <activity
+
+        <!--
+             <activity
             android:name=".SoundCloudMainActivity"
             android:icon="@drawable/soundcloudlogo"
             android:label="@string/app_name" >
@@ -24,9 +25,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> -->
+        </activity>
+        -->
 
-      
         <service
             android:name=".SoundCloudLiveWallpaperService"
             android:label="@string/app_name"
@@ -39,7 +40,13 @@
                 android:name="android.service.wallpaper"
                 android:resource="@xml/soundcloudwallpaper" />
         </service>
-      
+
+        <activity
+            android:name=".SoundCloudWallpaperSettings"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Light.WallpaperSettings" >
+        </activity>
     </application>
-      
+
 </manifest>

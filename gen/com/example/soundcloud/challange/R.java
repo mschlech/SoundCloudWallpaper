@@ -8,6 +8,10 @@
 package com.example.soundcloud.challange;
 
 public final class R {
+    public static final class array {
+        public static final int sourceKey=0x7f050000;
+        public static final int sourceValue=0x7f050001;
+    }
     public static final class attr {
     }
     public static final class drawable {
@@ -20,10 +24,11 @@ public final class R {
         public static final int main=0x7f030000;
     }
     public static final class string {
-        public static final int app_name=0x7f050001;
-        public static final int hello=0x7f050000;
+        public static final int app_name=0x7f060001;
+        public static final int hello=0x7f060000;
     }
     public static final class xml {
-        public static final int soundcloudwallpaper=0x7f040000;
+        public static final int preference=0x7f040000;
+        public static final int soundcloudwallpaper=0x7f040001;
     }
 }
