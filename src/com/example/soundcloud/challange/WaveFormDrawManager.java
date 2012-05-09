@@ -40,7 +40,7 @@ public class WaveFormDrawManager {
 
 	private String LOG_TAG = WaveFormDrawManager.class.getSimpleName();
 
-	private Bitmap mWaveformBitmap;
+//	private Bitmap mWaveformBitmap;
 	private Bitmap mSoundCloudLogoBitmap;
 
 	private final TextPaint mTextPaint;
@@ -105,7 +105,7 @@ public class WaveFormDrawManager {
 		 */
 		mTextPaint = new TextPaint() {
 			{
-				setTextSize(30f);
+				setTextSize(16f);
 				setColor(Color.rgb(255, 255, 240));
 				setMaskFilter(new BlurMaskFilter(3, Blur.SOLID));
 			}
@@ -148,9 +148,9 @@ public class WaveFormDrawManager {
 	 * @throws URISyntaxException
 	 * @throws MalformedURLException
 	 */
-	public void onCreate(final Context context, String waveformUrl) {
+	public void onCreate(final Context context) {
 
-		Log.i(LOG_TAG, " onCreate in WaveFormDrawManager " + waveformUrl);
+		Log.i(LOG_TAG, " onCreate in WaveFormDrawManager ");
 		mContext = context;
 		WindowManager windowManager = (WindowManager) context
 				.getSystemService(Context.WINDOW_SERVICE);
@@ -161,54 +161,19 @@ public class WaveFormDrawManager {
 		 */
 		mDensity = metrics.density;
 
-		mWaveformBitmap = getBitmapFromSoundCloud(waveformUrl);
+	//	mWaveformBitmap = getBitmapFromSoundCloud(waveformUrl);
 		mSoundCloudLogoBitmap = BitmapFactory.decodeResource(
 				context.getResources(), R.drawable.soundcloudlogo);
 
 	}
 
-	/**
-	 * 
-	 * @param uri
-	 * @return
-	 */
-	private Bitmap getBitmapFromSoundCloud(String url) {
-		try {
-			mUrl = new URL(url);
-		} catch (MalformedURLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} finally {
-
-		}
-		Bitmap result = null;
-		if (url != null) {
-			HttpURLConnection connection;
-			try {
-				Log.i(LOG_TAG, " Bitmap fetch ");
-				connection = (HttpURLConnection) mUrl.openConnection();
-				connection.setDoInput(true);
-				connection.connect();
-				InputStream input = connection.getInputStream();
-				result = BitmapFactory.decodeStream(input);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-		Log.i(LOG_TAG, "result");
-
-		return result;
-
-	}
 
 	/**
 	 * 
 	 * @param c
 	 *            a Canvas to draw on
 	 */
-	public void onDraw(final Canvas c) {
+	public synchronized void onDraw(final Canvas c) {
 
 		if (!isLayoutValid) {
 			createTextLayout();
@@ -217,17 +182,18 @@ public class WaveFormDrawManager {
 		if(mTrack==null){
 			return;
 		}
-		mWaveformBitmap = mTrack.waveFormURLPng;
+		
+		//	Log.i(LOG_TAG,"" + mWaveformBitmap.getHeight());
 
 		c.drawColor(Color.BLACK);
-		final int translateY = mCenterY - mWaveformBitmap.getHeight() / 2;
+		final int translateY = mCenterY - mTrack.waveFormURLPng.getHeight() / 2;
 		// Log.i(LOG_TAG, "TRANSLATE Y = " + translateY);
 		c.save();
 
 		c.translate(0, translateY);
 		c.drawRect(mRect, mRectPaint);
 
-		c.drawBitmap(mWaveformBitmap, 0, 0, mWaveFormPaint);
+		c.drawBitmap(mTrack.waveFormURLPng, 0, 0, mWaveFormPaint);
 		/**
 		 * @TODO resize the image to the appropriate position via onSizedChanged
 		 */
@@ -245,7 +211,7 @@ public class WaveFormDrawManager {
 		final String LOGSCALE = String.format("%.2f", scale);
 		// Log.i(LOG_TAG, "Scale " + LOGSCALE + " " + time);
 
-		mTextPaint.setMaskFilter(new BlurMaskFilter((float) scale, Blur.SOLID));
+		//mTextPaint.setMaskFilter(new BlurMaskFilter((float) scale, Blur.SOLID));
 
 		/**
 		 * rotate and flying text
@@ -308,19 +274,36 @@ public class WaveFormDrawManager {
 	 *       memory
 	 */
 	public void onDestroy() {
-		if (mWaveformBitmap != null && mSoundCloudLogoBitmap != null) {
-			mWaveformBitmap.recycle();
+		if ( mSoundCloudLogoBitmap != null) {
+			
 			mSoundCloudLogoBitmap.recycle();
 
-			mWaveformBitmap = null;
+			
 			mSoundCloudLogoBitmap = null;
 		}
 
 	}
 
-	public void setTrack(Tracks track) {
-		mTrack = track;
+	public synchronized void setTrack(Tracks track) {
+		
 		isLayoutValid = false;
+		mTrack = track;
+		if (mTrack.waveFormURLPng != null) {
+			mRect.set(0, 0, mWidth, mTrack.waveFormURLPng.getHeight());
+
+			/**
+			 * the horizontal gradient
+			 */
+			final int y1 = 0;
+			final int x1 = mWidth / 2;
+			final int y2 = mTrack.waveFormURLPng.getHeight();
+			final int x2 = x1;
+			// a linear gradient beginning from left right corner to right down
+			// corner
+			mRectPaint.setShader((new LinearGradient(x1, y1, x2, y2, COLORS,
+					POSITIONS, TileMode.CLAMP)));
+
+		}
 
 	}
 
@@ -336,41 +319,21 @@ public class WaveFormDrawManager {
 		mHeight = height;
 		mCenterY = height / 2;
 		mCenterX = width/2;
-		
-		if (mWaveformBitmap != null) {
-			mRect.set(0, 0, width, mWaveformBitmap.getHeight());
-
-			/**
-			 * the horizontal gradient
-			 */
-			final int y1 = 0;
-			final int x1 = width / 2;
-			final int y2 = mWaveformBitmap.getHeight();
-			final int x2 = x1;
-			// a linear gradient beginning from left right corner to right down
-			// corner
-			mRectPaint.setShader((new LinearGradient(x1, y1, x2, y2, COLORS,
-					POSITIONS, TileMode.CLAMP)));
-
-		} else {
-			Log.w(LOG_TAG, " forgot to call onCreate Bitmap is "
-					+ mWaveformBitmap);
-		}
 	}
 
-	/**
-	 * 
-	 * @param result
-	 */
-	public void setBitmap(Bitmap result) {
-		Log.i(LOG_TAG, " setBitMap ");
-		if (mWaveformBitmap != null && mSoundCloudLogoBitmap != null) {
-			mSoundCloudLogoBitmap.recycle();
-			mWaveformBitmap.recycle();
-
-		}
-		mSoundCloudLogoBitmap = BitmapFactory.decodeResource(
-				mContext.getResources(), R.drawable.soundcloudlogo);
-		mWaveformBitmap = result;
-	}
+//	/**
+//	 * 
+//	 * @param result
+//	 */
+//	public void setBitmap(Bitmap result) {
+//		Log.i(LOG_TAG, " setBitMap ");
+//		if (mWaveformBitmap != null && mSoundCloudLogoBitmap != null) {
+//			mSoundCloudLogoBitmap.recycle();
+//			mWaveformBitmap.recycle();
+//
+//		}
+//		mSoundCloudLogoBitmap = BitmapFactory.decodeResource(
+//				mContext.getResources(), R.drawable.soundcloudlogo);
+//		mWaveformBitmap = result;
+//	}
 }
