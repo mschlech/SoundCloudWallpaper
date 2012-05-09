@@ -28,7 +28,7 @@ import com.soundcloud.api.Request;
 import com.soundcloud.api.Token;
 
 /**
- * @author marcus 
+ * @author marcus
  * 
  */
 public class SoundCloudApi {
@@ -71,8 +71,7 @@ public class SoundCloudApi {
 	 */
 	public static Token authenticate() throws Exception {
 
-		ApiWrapper mWrapper = new ApiWrapper(CLIENT_ID, CLIENT_SECRET, null,
-				null, Env.LIVE);
+		ApiWrapper mWrapper = new ApiWrapper(CLIENT_ID, CLIENT_SECRET, null, null, Env.LIVE);
 		Token token;
 		Log.d(LOG_TAG, "got a wrapper ");
 		if (mWrapper.debugRequests) {
@@ -92,8 +91,7 @@ public class SoundCloudApi {
 	 * @throws Exception
 	 */
 	public static ApiWrapper getApiWrapper() throws Exception {
-		ApiWrapper mWrapper = new ApiWrapper(CLIENT_ID, CLIENT_SECRET, null,
-				authenticate(), Env.LIVE);
+		ApiWrapper mWrapper = new ApiWrapper(CLIENT_ID, CLIENT_SECRET, null, authenticate(), Env.LIVE);
 
 		Log.d(LOG_TAG, "got a api wrapper ");
 		if (mWrapper.debugRequests) {
@@ -186,8 +184,7 @@ public class SoundCloudApi {
 				jsonArray = new JSONArray(jsonString);
 				for (int i = 0; i < jsonArray.length(); i++) {
 					Tracks tracks = new Tracks();
-					tracks.trackName = (String) jsonArray.getJSONObject(i).get(
-							"title");
+					tracks.trackName = (String) jsonArray.getJSONObject(i).get("title");
 					trackList.add(tracks);
 				}
 			} else {
@@ -211,8 +208,7 @@ public class SoundCloudApi {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<Tracks> getMyWaveformUrl(
-			ApiWrapper apiWrapper) throws Exception {
+	public static List<Tracks> getMyWaveformUrl(ApiWrapper apiWrapper) throws Exception {
 
 		// ApiWrapper apiWrapper = getApiWrapper();
 
@@ -232,7 +228,7 @@ public class SoundCloudApi {
 
 			HttpResponse soundCloudResponse = apiWrapper.get(requestResource);
 
-			if (soundCloudResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK ) {
+			if (soundCloudResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 				final String jsonString = Http.getString(soundCloudResponse);
 				jsonArray = new JSONArray(jsonString);
 				for (int i = 0; i < jsonArray.length(); i++) {
@@ -241,37 +237,36 @@ public class SoundCloudApi {
 					Tracks tracks = new Tracks();
 
 					if ((String) jsonArray.getJSONObject(i).get("title") != null) {
-						tracks.trackName = (String) jsonArray.getJSONObject(i)
-								.get("title");
+						tracks.trackName = (String) jsonArray.getJSONObject(i).get("title");
 					} else {
 						tracks.trackName = "";
 					}
 
 					if ((String) jsonArray.getJSONObject(i).get("waveform_url") != null) {
-						tracks.waveformUrl = (String) jsonArray
-								.getJSONObject(i).get("waveform_url");
+						tracks.waveformUrl = (String) jsonArray.getJSONObject(i).get("waveform_url");
 					} else {
 						tracks.waveformUrl = "www.soundcloud.com";
 					}
 
-					if ((String) jsonArray.getJSONObject(i).getString(
-							"permalink_url") != null) {
-						tracks.permalink_url = (String) jsonArray
-								.getJSONObject(i).getString("permalink_url");
+					if ((String) jsonArray.getJSONObject(i).getString("permalink_url") != null) {
+						tracks.permalink_url = (String) jsonArray.getJSONObject(i).getString("permalink_url");
 					} else {
 						tracks.permalink_url = "www.soundcloud.com";
 					}
-						tracks.waveFormURLPng = getBitmapFromSoundCloud(tracks.waveformUrl);
-					
+					tracks.waveFormURLPng = getBitmapFromSoundCloud(tracks.waveformUrl);
+
 					if ((String) jsonArray.getJSONObject(i).getString("genre") != null) {
-						tracks.genre = (String) jsonArray.getJSONObject(i)
-								.getString("genre");
+						tracks.genre = (String) jsonArray.getJSONObject(i).getString("genre");
 					} else {
 						tracks.genre = "n A ";
 					}
 
-					Log.i(LOG_TAG, " TRACKS WaveFormUrl -> "
-							+ tracks.waveformUrl);
+					JSONObject user = jsonArray.getJSONObject(i).getJSONObject("user");
+					if (user!=null){
+						tracks.userName = (String) user.getString("username");
+					}
+						 
+					Log.i(LOG_TAG, " TRACKS WaveFormUrl -> " + tracks.waveformUrl);
 					// tracks.genre = (String)
 					// jsonArray.getJSONObject(i).get("genre");
 					// tracks.permalink_url = (String)
@@ -289,9 +284,10 @@ public class SoundCloudApi {
 		return trackList;
 
 	}
+
 	private static Bitmap getBitmapFromSoundCloud(String url) {
-		Log.i(LOG_TAG," fetcing bitmap in sourcloudapi");
-		URL mUrl =null;
+		Log.i(LOG_TAG, " fetcing bitmap in sourcloudapi");
+		URL mUrl = null;
 		try {
 			mUrl = new URL(url);
 		} catch (MalformedURLException e1) {
@@ -310,7 +306,7 @@ public class SoundCloudApi {
 				connection.connect();
 				InputStream input = connection.getInputStream();
 				result = BitmapFactory.decodeStream(input);
-				
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -322,6 +318,7 @@ public class SoundCloudApi {
 		return result;
 
 	}
+
 	/**
 	 * @return
 	 * @throws Exception

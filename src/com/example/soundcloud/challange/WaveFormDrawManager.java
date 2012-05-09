@@ -1,15 +1,7 @@
 package com.example.soundcloud.challange;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.example.soundcloud.challange.data.Tracks;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -23,7 +15,6 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
-import android.text.DynamicLayout;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -31,22 +22,41 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 
+import com.example.soundcloud.challange.SoundCloudLiveWallpaperService.SoundCloudWallpaperEngine;
+import com.example.soundcloud.challange.data.Tracks;
+import com.nineoldandroids.animation.Animator;
+import com.nineoldandroids.animation.Animator.AnimatorListener;
+import com.nineoldandroids.animation.AnimatorSet;
+import com.nineoldandroids.animation.ArgbEvaluator;
+import com.nineoldandroids.animation.ObjectAnimator;
+
 /**
  * 
  * @author marcus
  * 
  */
-public class WaveFormDrawManager {
+public class WaveFormDrawManager implements AnimatorListener {
 
+	@SuppressWarnings("unused")
 	private String LOG_TAG = WaveFormDrawManager.class.getSimpleName();
 
-//	private Bitmap mWaveformBitmap;
+	// private Bitmap mWaveformBitmap;
 	private Bitmap mSoundCloudLogoBitmap;
 
 	private final TextPaint mTextPaint;
 	private final Paint mRectPaint;
 	private final Paint mWaveFormPaint;
 	private final Paint mSoundCloudLogoPaint;
+	private Animator mFadeInAnimator;
+	private Animator mFadeOutAnimator;
+	private Animator mTextOutAnimator;
+	private Animator mTextInAnimator;
+	private Tracks mLastTrack;
+	private int mTitleColor = Color.WHITE;
+	private int mOwnerColor=Color.WHITE;
+	private ObjectAnimator mTextAnimator;
+	private ObjectAnimator mTextScaleAnimator;
+	private int mYPosTitle, mYPosOwner, mYPosLogo;
 
 	/**
 	 * get the actual information of the passed text object
@@ -54,58 +64,36 @@ public class WaveFormDrawManager {
 	private Tracks mTrack;
 	private boolean isLayoutValid = true;
 
-	private int mCenterY;
-	private int mCenterX;
+	private int mScrollOffset = 0;
 
-	private long TIME_OFFSET = System.currentTimeMillis();
-
-	private final Rect mRect = new Rect();
-	private final Rect mTextBounds = new Rect();
+	private final Rect mGradientRect = new Rect();
 	/**
 	 * textlayout helper class
 	 */
-	private List<StaticLayout> mStaticLayoutList = new ArrayList<StaticLayout>();
+	private StaticLayout mStaticLayoutTitle;
+	private StaticLayout mStaticLayoutOwner;
+	private StaticLayout mStaticLayoutLastTitle;
+	private StaticLayout mStaticLayoutLastOwner;
 
-	private float mDensity = 1;
-
-	private final static int[] COLORS = { 0, Color.rgb(255, 127, 0),
-			Color.rgb(247, 247, 247) };
-	private final static float[] POSITIONS = { 0, 0.5f, 1 };
-
-	private URL mUrl;
-
-	private Context mContext;
+	private final static int[] COLORS = { 0, Color.rgb(255, 127, 0), 0xffffffff, Color.rgb(255, 127, 0), 0 };
+	private final static float[] POSITIONS = { 0, 0.3f, 0.5f, 0.7f, 1 };
 
 	private int mWidth;
-
 	private int mHeight;
+	private SoundCloudWallpaperEngine mEngine;
 
 	/**
 	 * default constructor defining the style static initializer
 	 */
-	public WaveFormDrawManager() {
+	public WaveFormDrawManager(SoundCloudWallpaperEngine engine) {
 
-		/*
-		 * The matrix is stored in a single array, and its treated as follows: [
-		 * a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t ] When
-		 * applied to a color [r, g, b, a], the resulting color is computed as
-		 * (after clamping) ; Ê R' = a*R + b*G + c*B + d*A + e; G' = f*R + g*G +
-		 * h*B + i*A + j; B' = k*R + l*G + m*B + n*A + o; A' = p*R + q*G + r*B +
-		 * s*A + t;
-		 */
-		Paint paint = new Paint();
-		float[] matrix = { 1, 1, 1, 1, 1, // red
-				0, 0, 0, 0, 0, // green
-				0, 0, 0, 0, 0, // blue
-				1, 1, 1, 1, 1 // alpha
-		};
+		mEngine = engine;
 
 		/**
 		 * optional task to display the trackname / url on the homescreen
 		 */
 		mTextPaint = new TextPaint() {
 			{
-				setTextSize(16f);
 				setColor(Color.rgb(255, 255, 240));
 				setMaskFilter(new BlurMaskFilter(3, Blur.SOLID));
 			}
@@ -119,9 +107,6 @@ public class WaveFormDrawManager {
 				 */
 				setFilterBitmap(true);
 				setAntiAlias(true);
-				// 0xA R G B
-				// white = 255 255 255 255
-				// 255 0 0 0
 				setColorFilter(new LightingColorFilter(0xff000000, 0x0));
 			}
 
@@ -150,23 +135,18 @@ public class WaveFormDrawManager {
 	 */
 	public void onCreate(final Context context) {
 
-		Log.i(LOG_TAG, " onCreate in WaveFormDrawManager ");
-		mContext = context;
-		WindowManager windowManager = (WindowManager) context
-				.getSystemService(Context.WINDOW_SERVICE);
+		WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		DisplayMetrics metrics = new DisplayMetrics();
 		windowManager.getDefaultDisplay().getMetrics(metrics);
 		/**
 		 * for high or low dpi device
 		 */
-		mDensity = metrics.density;
+		mTextPaint.setTextSize(24 * metrics.density);
 
-	//	mWaveformBitmap = getBitmapFromSoundCloud(waveformUrl);
-		mSoundCloudLogoBitmap = BitmapFactory.decodeResource(
-				context.getResources(), R.drawable.soundcloudlogo);
-
+		if (mSoundCloudLogoBitmap == null) {
+			mSoundCloudLogoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.soundcloudlogo);
+		}
 	}
-
 
 	/**
 	 * 
@@ -174,99 +154,182 @@ public class WaveFormDrawManager {
 	 *            a Canvas to draw on
 	 */
 	public synchronized void onDraw(final Canvas c) {
-
-		if (!isLayoutValid) {
-			createTextLayout();
-		}
-		// mWaveformBitmap = getBitmapFromSoundCloud(waveformUrl);
-		if(mTrack==null){
+		if (mTrack == null) {
 			return;
 		}
-		
-		//	Log.i(LOG_TAG,"" + mWaveformBitmap.getHeight());
+
+		if (!isLayoutValid) {
+			createLayout();
+		}
 
 		c.drawColor(Color.BLACK);
-		final int translateY = mCenterY - mTrack.waveFormURLPng.getHeight() / 2;
-		// Log.i(LOG_TAG, "TRANSLATE Y = " + translateY);
+
+		/* draw waveform */
 		c.save();
-
-		c.translate(0, translateY);
-		c.drawRect(mRect, mRectPaint);
-
+		c.translate(0, mYPosOwner);
+		c.drawRect(mGradientRect, mRectPaint);
+		mWaveFormPaint.setAlpha((int) (mCurrentAlpha * 255));
+		c.translate(mScrollOffset, 0);
 		c.drawBitmap(mTrack.waveFormURLPng, 0, 0, mWaveFormPaint);
-		/**
-		 * @TODO resize the image to the appropriate position via onSizedChanged
-		 */
-		c.drawBitmap(mSoundCloudLogoBitmap, 100, 100, mSoundCloudLogoPaint);
-		/**
-		 * moving the backround not the object
-		 */
+
+		if (mLastTrack != null) {
+			mWaveFormPaint.setAlpha((int) (mLastAlpha * 255));
+			c.drawBitmap(mLastTrack.waveFormURLPng, 0, 0, mWaveFormPaint);
+		}
 		c.restore();
 
-		/**
-		 * permanent moving value between -1 and 1
-		 */
-		final double time = ((System.currentTimeMillis() - TIME_OFFSET) * 1F) / 1000;
-		final double scale = (Math.sin(time) + 1) * 8 * mDensity;
-		final String LOGSCALE = String.format("%.2f", scale);
-		// Log.i(LOG_TAG, "Scale " + LOGSCALE + " " + time);
+		/* draw logo */
+		c.save();
 
-		//mTextPaint.setMaskFilter(new BlurMaskFilter((float) scale, Blur.SOLID));
+		final float scale = (mWidth*1f) / mEngine.getDesiredMinimumWidth();
+		final float pos = Math.abs(mScrollOffset) * scale;
+		c.translate(pos, mYPosLogo);
+		// c.translate(mWidth - mSoundCloudLogoBitmap.getWidth(), mYPosLogo);
+		c.drawBitmap(mSoundCloudLogoBitmap, 0, 0, mSoundCloudLogoPaint);
+		c.restore();
 
-		/**
-		 * rotate and flying text
-		 */
-		// radians to pi 180/Math.pi
-		float degree = (float) (Math.sin(time) * (180 / Math.PI));
-		/**
-		 * display the container segments for the texts
-		 */
-		for (int i = 0; i < mStaticLayoutList.size(); i++) {
-			/**
-			 * d = change signed and unsigned 1
-			 */
-			float d = (float)((degree/3)*Math.pow(-1, i%2));
-			drawText(mStaticLayoutList.get(i), d, 0, i * 30 + 20, c);
+		/* draw title */
+		c.save();
+		c.translate(mCurrentTextPosition, mStaticLayoutTitle.getHeight());
+		c.scale(mTitleSize, mTitleSize, mWidth/2, mStaticLayoutTitle.getHeight()/2);
+		mTextPaint.setColor(mTitleColor);
+		mStaticLayoutTitle.draw(c,null,mTextPaint,0);		
+		c.restore();
+
+		if (mStaticLayoutLastTitle != null && mLastTrack != null) {
+			c.save();
+			c.translate(mLastTextPosition, mStaticLayoutLastTitle.getHeight());
+			c.scale(mTitleSize, mTitleSize, mWidth/2, mStaticLayoutLastTitle.getHeight()/2);
+			mTextPaint.setColor(mTitleColor);
+			mStaticLayoutLastTitle.draw(c,null,mTextPaint,0);		
+			c.restore();
 		}
-		/**
-		 * optional task to display the trackname / url on the homescreen
-		 */
+
+		/* draw owner */
+		if (mStaticLayoutOwner != null) {
+			c.save();
+			c.translate(mCurrentTextPosition, mYPosTitle);
+			c.scale(mOwnerSize, mOwnerSize, mWidth/2, mStaticLayoutOwner.getHeight()/2);
+			mTextPaint.setColor(mOwnerColor);
+			mStaticLayoutOwner.draw(c,null,mTextPaint,0);
+			c.restore();
+		}
+		if (mStaticLayoutLastOwner != null && mLastTrack != null) {
+			c.save();
+			c.translate(mLastTextPosition, mYPosTitle);
+			c.scale(mOwnerSize, mOwnerSize, mWidth/2, mStaticLayoutLastOwner.getHeight()/2);
+			mTextPaint.setColor(mOwnerColor);
+			mStaticLayoutLastOwner.draw(c,null,mTextPaint,0);
+			c.restore();
+		}
+
+		// mTextPaint.setMaskFilter(new BlurMaskFilter((float) scale,
+		// Blur.SOLID));
 
 	}
 
+	public boolean onTap(final float x, final float y) {
+		final int index = (int) ((Math.random() * 100) % 3);
+		Log.i(LOG_TAG, "new animation type = " + index);
+		/* hit test: which text was tapped? */
+		if (y < mYPosTitle) {
+			initColorAnimation("titleColor","titleSize");
+			return true;
+
+		} else if (y < mYPosOwner) {
+			initColorAnimation("ownerColor","ownerSize");
+			return true;
+		}
+		return false;
+	}
+
+	private void initColorAnimation(final String propertyName,final String sizeProperty) {
+		if (mTextAnimator != null && mTextAnimator.isRunning()) {
+			mTextAnimator.addListener(new AnimatorListener() {
+
+				@Override
+				public void onAnimationStart(Animator animation) {
+
+				}
+
+				@Override
+				public void onAnimationRepeat(Animator animation) {
+				}
+
+				@Override
+				public void onAnimationEnd(Animator animation) {
+				}
+
+				@Override
+				public void onAnimationCancel(Animator animation) {
+					startAnimation(propertyName,sizeProperty);
+				}
+			});
+			mTextAnimator.cancel();
+		}
+		startAnimation(propertyName,sizeProperty);
+	}
+
+	private void startAnimation(final String propertyName, final String sizeProperty) {
+		mTextAnimator = ObjectAnimator.ofInt(this, propertyName, Color.WHITE, Color.RED);						
+		mTextScaleAnimator = ObjectAnimator.ofFloat(this, sizeProperty, 1, 1.2f);
+		
+		mTextAnimator.setEvaluator(new ArgbEvaluator());
+		AnimatorSet set = new AnimatorSet();
+		set.playTogether(mTextAnimator, mTextScaleAnimator);
+		set.setDuration(1000);
+		mTextAnimator.setRepeatCount(1);
+		mTextAnimator.setRepeatMode(ObjectAnimator.REVERSE);
+		mTextScaleAnimator.setRepeatCount(1);
+		mTextScaleAnimator.setRepeatMode(ObjectAnimator.REVERSE);
+		set.start();
+}
+	
+	private float mTitleSize=1;
+	private float mOwnerSize=1;
+	public void setTitleSize(final float size){
+		mTitleSize = size;
+	}
+	public void setOwnerSize(final float size){
+		mOwnerSize = size;
+	}
+
+	public void setTitleColor(final int color) {
+		Log.i(LOG_TAG,"setTitleColor" + color);
+		mTitleColor = color;
+		mEngine.scheduleDraw();
+	}
+
+	public void setOwnerColor(final int color) {
+		mOwnerColor = color;
+		mEngine.scheduleDraw();
+	}
+
 	/**
+	 * 
 	 * choose different mTextPaint for each text to display
 	 */
-	private void createTextLayout() {
+	private void createLayout() {
 		if (mTrack != null) {
-			mStaticLayoutList.clear();
 
-			mStaticLayoutList.add(new StaticLayout(mTrack.trackName,
-					mTextPaint, mWidth, Alignment.ALIGN_CENTER, 1, 0, false));
-			mStaticLayoutList.add(new StaticLayout(mTrack.genre, mTextPaint,
-					mWidth, Alignment.ALIGN_CENTER, 1, 0, false));
-			mStaticLayoutList.add(new StaticLayout(mTrack.permalink_url,
-					mTextPaint, mWidth, Alignment.ALIGN_CENTER, 1, 0, false));
+			mStaticLayoutLastTitle = mStaticLayoutTitle;
+			mStaticLayoutTitle = new StaticLayout(mTrack.trackName, mTextPaint, mWidth, Alignment.ALIGN_CENTER, 1, 0, false);
 
+			if (mTrack.userName != null) {
+				mStaticLayoutLastOwner = mStaticLayoutOwner;
+				mStaticLayoutOwner = new StaticLayout(mTrack.userName, mTextPaint, mWidth, Alignment.ALIGN_CENTER, 1, 0, false);
+			}
+
+			final float startHeight = mHeight * 0.80f;
+
+			mYPosLogo = (int) (startHeight - mSoundCloudLogoBitmap.getHeight());
+
+			mYPosOwner = mYPosLogo - mTrack.waveFormURLPng.getHeight();
+			final float remainingHeight = startHeight - mYPosOwner;
+			mYPosTitle = (int) (remainingHeight * 0.67f);
+
+			isLayoutValid = true;
 		}
-	}
-
-	/**
-	 * avoid gc by preallocated rect and not returning a rect.
-	 * 
-	 * @param text
-	 * @param outBounds
-	 *            defines geometry text object
-	 */
-	private void drawText(final StaticLayout staticLayout, final float degrees,
-			final int x, final int y, final Canvas c) {
-		c.save();
-		c.translate(x, y);
-
-		c.rotate(degrees, mCenterX-x, staticLayout.getHeight()/2);
-		staticLayout.draw(c);
-		c.restore();
-
 	}
 
 	/**
@@ -274,23 +337,24 @@ public class WaveFormDrawManager {
 	 *       memory
 	 */
 	public void onDestroy() {
-		if ( mSoundCloudLogoBitmap != null) {
-			
+		if (mSoundCloudLogoBitmap != null) {
 			mSoundCloudLogoBitmap.recycle();
-
-			
 			mSoundCloudLogoBitmap = null;
 		}
+	}
 
+	public void setScrollOffset(final int xOffset) {
+		mScrollOffset = xOffset;
+		mEngine.scheduleDraw();
 	}
 
 	public synchronized void setTrack(Tracks track) {
-		
+
 		isLayoutValid = false;
+		mLastTrack = mTrack;
 		mTrack = track;
 		if (mTrack.waveFormURLPng != null) {
-			mRect.set(0, 0, mWidth, mTrack.waveFormURLPng.getHeight());
-
+			mGradientRect.set(0, 0, mWidth, mTrack.waveFormURLPng.getHeight());
 			/**
 			 * the horizontal gradient
 			 */
@@ -300,11 +364,44 @@ public class WaveFormDrawManager {
 			final int x2 = x1;
 			// a linear gradient beginning from left right corner to right down
 			// corner
-			mRectPaint.setShader((new LinearGradient(x1, y1, x2, y2, COLORS,
-					POSITIONS, TileMode.CLAMP)));
+			mRectPaint.setShader((new LinearGradient(x1, y1, x2, y2, COLORS, POSITIONS, TileMode.CLAMP)));
+			// start fade in and fade out animation
+			mFadeInAnimator = ObjectAnimator.ofFloat(this, "currentAlpha", 0, 1);
+			mFadeOutAnimator = ObjectAnimator.ofFloat(this, "lastAlpha", 1, 0);
+			mTextInAnimator = ObjectAnimator.ofFloat(this, "currentTextPosition", mWidth, 0);
+			mTextOutAnimator = ObjectAnimator.ofFloat(this, "lastTextPosition", 0, -mWidth);
 
+			AnimatorSet set = new AnimatorSet();
+			set.playTogether(mFadeInAnimator, mFadeOutAnimator, mTextInAnimator, mTextOutAnimator);
+			set.setDuration(1000);
+
+			set.addListener(this);
+			set.start();
 		}
 
+	}
+
+	private float mCurrentAlpha;
+	private float mLastAlpha;
+	private float mCurrentTextPosition;
+	private float mLastTextPosition;
+
+	public void setLastTextPosition(final float val) {
+		mLastTextPosition = val;
+	}
+
+	public void setCurrentTextPosition(final float val) {
+		mCurrentTextPosition = val;
+	}
+
+	public void setCurrentAlpha(final float val) {
+		mCurrentAlpha = val;
+		mEngine.scheduleDraw();
+
+	}
+
+	public void setLastAlpha(final float val) {
+		mLastAlpha = val;
 	}
 
 	/**
@@ -317,23 +414,29 @@ public class WaveFormDrawManager {
 		isLayoutValid = false;
 		mWidth = width;
 		mHeight = height;
-		mCenterY = height / 2;
-		mCenterX = width/2;
 	}
 
-//	/**
-//	 * 
-//	 * @param result
-//	 */
-//	public void setBitmap(Bitmap result) {
-//		Log.i(LOG_TAG, " setBitMap ");
-//		if (mWaveformBitmap != null && mSoundCloudLogoBitmap != null) {
-//			mSoundCloudLogoBitmap.recycle();
-//			mWaveformBitmap.recycle();
-//
-//		}
-//		mSoundCloudLogoBitmap = BitmapFactory.decodeResource(
-//				mContext.getResources(), R.drawable.soundcloudlogo);
-//		mWaveformBitmap = result;
-//	}
+	@Override
+	public void onAnimationStart(Animator animation) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onAnimationEnd(Animator animation) {
+		mLastTrack = null;
+	}
+
+	@Override
+	public void onAnimationCancel(Animator animation) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onAnimationRepeat(Animator animation) {
+		// TODO Auto-generated method stub
+
+	}
+
 }
