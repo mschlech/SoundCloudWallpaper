@@ -185,10 +185,12 @@ public class WaveFormDrawManager {
 	 * @param c
 	 *            a Canvas to draw on
 	 */
-	public void onDraw(final Canvas c, String genre, String title,
+	public void onDraw(final Canvas c, String genre, String title,Bitmap waveFormUrlPng,
 			String permalink_url) {
-//		Log.i(LOG_TAG, "genre = " + genre + " title " + title
-//				+ " permalink_url " + permalink_url);
+		Log.i(LOG_TAG, "genre = " + genre + " title " + title
+				+ " permalink_url " + permalink_url);
+		//mWaveformBitmap = getBitmapFromSoundCloud(waveformUrl);
+		mWaveformBitmap = waveFormUrlPng;
 
 		c.drawColor(Color.BLACK);
 		final int translateY = mCenterY - mWaveformBitmap.getHeight() / 2;
@@ -235,18 +237,18 @@ public class WaveFormDrawManager {
 		/**
 		 * optional task to display the trackname / url on the homescreen
 		 */
-		int x = (int) ((int) (300) + (Math.sin(time) + 1) * 2);
-		int y = (int) ((int) (400) + (Math.sin(time) + 1) * 2);
-		Rect rect = new Rect();
-		mTextPaint.getTextBounds(genre, 0, genre.length(), rect);
-		c.translate(x, y);
-		mTextPaint.setStyle(Paint.Style.FILL);
-
-		c.translate(-x, -y);
-		c.rotate(-45, x + rect.exactCenterX(), y + rect.exactCenterY());
-		mTextPaint.setStyle(Paint.Style.FILL);
-		mTextPaint.setFakeBoldText(true);
-		c.drawText(genre, x, y, mTextPaint);
+//		int x = (int) ((int) (300) + (Math.sin(time) + 1) * 2);
+//		int y = (int) ((int) (400) + (Math.sin(time) + 1) * 2);
+//		Rect rect = new Rect();
+//		mTextPaint.getTextBounds(genre, 0, genre.length(), rect);
+//		c.translate(x, y);
+//		mTextPaint.setStyle(Paint.Style.FILL);
+//
+//		c.translate(-x, -y);
+//		c.rotate(-45, x + rect.exactCenterX(), y + rect.exactCenterY());
+//		mTextPaint.setStyle(Paint.Style.FILL);
+//		mTextPaint.setFakeBoldText(true);
+//		c.drawText(genre, x, y, mTextPaint);
 
 		c.drawText(genre, 100, 100, mTextPaint);
 		c.drawText(title, 140, 140, mTextPaint);
@@ -303,6 +305,7 @@ public class WaveFormDrawManager {
 	 * @param result
 	 */
 	public void setBitmap(Bitmap result) {
+		Log.i(LOG_TAG, " setBitMap ");
 		if (mWaveformBitmap != null && mSoundCloudLogoBitmap != null) {
 			mSoundCloudLogoBitmap.recycle();
 			mWaveformBitmap.recycle();

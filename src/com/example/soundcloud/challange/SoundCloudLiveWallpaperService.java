@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
@@ -43,18 +44,12 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 	final String LOG_TAG = "SoundCloudLiveWallpaperActivity";
 
 	private Handler mHandler = new Handler();
-
+	private Handler mHandlerTrack = new Handler();
 	private boolean isDestroyed = false;
 
 	private AndroidHttpClient ahc;
 
-	private int run = 0;
-
-
-	/**
-	 * a good idea to persist the png in the local filesystem
-	 */
-	// private Input mImagePath = openFileInput(name);
+	public static int run;
 
 	/**
 	 * offset for time bound reload / randomized displayed waveform png
@@ -68,7 +63,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		run=0;
+		run = 0;
 		return new SoundCloudWallpaperEngine();
 	}
 
@@ -84,7 +79,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		private String soundCloudPassword = mPrefs.getString("password",
 				"linus123");
 
-		private String soundCloudSource = mPrefs.getString("source", "favorites");
+		private String soundCloudSource = mPrefs.getString("source",
+				"favorites");
 
 		private TrackListLoader mTrackListLoader;
 
@@ -98,15 +94,18 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		private GestureDetector mGestureDetector;
 
-
 		SoundCloudWallpaperEngine() {
-			mApiWrapper = new SoundCloudApi(soundCloudUser, soundCloudPassword, soundCloudSource);
+			mApiWrapper = new SoundCloudApi(soundCloudUser, soundCloudPassword,
+					soundCloudSource);
+
 			mPrefs.registerOnSharedPreferenceChangeListener(this);
 			onSharedPreferenceChanged(mPrefs, null);
 		}
 
 		void drawWavePic() {
-			//Log.i(LOG_TAG, " drawPic invoked" + run);
+			long now = SystemClock.currentThreadTimeMillis();
+			// Log.i(LOG_TAG, " drawPic invoked" + run + " invocationTime " +
+			// (SystemClock.currentThreadTimeMillis()/(60*1000)));
 			final SurfaceHolder holder = getSurfaceHolder();
 
 			Canvas c = null;
@@ -120,49 +119,75 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				if (c != null)
 					holder.unlockCanvasAndPost(c);
 			}
-
 			// Reschedule the next redraw
 			mHandler.removeCallbacks(mDrawWaveFrameRunnable);
+			mHandlerTrack.removeCallbacks(mNextRun);
+
 			if (mVisible) {
 				// Log.i(LOG_TAG, "mVisible = " + mVisible);
 				mHandler.postDelayed(mDrawWaveFrameRunnable, 1000 / 25);
+				mHandlerTrack.postDelayed(mNextRun, 1000 / 25);
 			}
 		}
+
+		/**
+		 * calls the WaveFormDrawManager
+		 * 
+		 * @param c
+		 */
 
 		private void drawFrame(final Canvas c) {
 			// Log.i(LOG_TAG, " drawFrame invoked" + run);
 			// content
-			long currentTime=SystemClock.currentThreadTimeMillis();
-			run = getRandomRun(currentTime);
-			
-			Log.i(LOG_TAG,"run " +currentTime);
+			// Log.i(LOG_TAG , " started at  " + invocationTime );
+			// long currentTime=SystemClock.currentThreadTimeMillis();
+			// Log.i(LOG_TAG, " next run in "+(invocationTime+nextRun) + " now "
+			// + (SystemClock.currentThreadTimeMillis()));
+			// if((SystemClock.currentThreadTimeMillis()+nextRun) ==
+			// invocationTime)
+			// {
+			// Log.i(LOG_TAG,"next run");
+			// run = getRandomRun(1);
+			// }
+			// Log.i(LOG_TAG,"run " +currentTime);
+
+			// Log.i(LOG_TAG, " in drawFrame " + run);
 			mDrawManager.onDraw(c, tracks.get(run).genre,
-					tracks.get(run).trackName, tracks.get(run).permalink_url);
+					tracks.get(run).trackName,  tracks.get(run).waveFormURLPng, tracks.get(run).permalink_url);
 		}
 
-		/**
-		 * task get a random run so a random waveform from the soundcloud resource
-		 * @return integer 
-		 */
-		int getRandomRun(long timeOffset) {
-			
-			Random randomWavForm = new Random();
-			int max = tracks.size()-1;
-			int min = 0;
-			run = (randomWavForm.nextInt(max-min + 1) +min);
-			return run;
-		}
-		
 		/**
 		 * 
 		 */
 		private final Runnable mDrawWaveFrameRunnable = new Runnable() {
 			public void run() {
-				// Log.i(LOG_TAG, " mDrawWaveFrameRunnable thread invoked");
+				Log.i(LOG_TAG, " mDrawWaveFrameRunnable thread invoked");
 
 				drawWavePic();
 			}
 		};
+
+		/**
+		 * task get a random run so a random waveform from the soundcloud
+		 * resource
+		 */
+		private final Runnable mNextRun = new Runnable() {
+			public void run() {
+				Log.i(LOG_TAG, "Get random track ");
+				getRandomTrack();
+			}
+		};
+
+		/**
+		 * 
+		 */
+		private void getRandomTrack() {
+			Log.i(LOG_TAG, "next getRandomRunTask");
+			Random randomWavForm = new Random();
+			int max = tracks.size() - 1;
+			int min = 0;
+			run = (randomWavForm.nextInt(max - min + 1) + min);
+		}
 
 		@Override
 		public int getDesiredMinimumHeight() {
@@ -194,9 +219,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		@Override
 		public Bundle onCommand(String action, int x, int y, int z,
 				Bundle extras, boolean resultRequested) {
-			/**
-			 * open the browser
-			 */
+
 			return super.onCommand(action, x, y, z, extras, resultRequested);
 		}
 
@@ -222,14 +245,14 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				// Log.i(LOG_TAG, "in onCreate tracks to pass = " + tracks);
 				mDrawManager.onCreate(getApplicationContext(),
 						tracks.get(run).waveformUrl);
-				//run = run <= tracks.size() ? run = +1 : 0;
+				// run = run <= tracks.size() ? run = +1 : 0;
 				// Log.i(LOG_TAG, "next run " + run);
 			} else {
 				// Log.i(LOG_TAG, "no text from network");
 
 				mDrawManager.onCreate(getApplicationContext(), "defaultImage");
 			}
-			
+
 			/**
 			 * optional task to open the browser or the installed soundcloud app
 			 * and invoke the permalink_url
@@ -271,8 +294,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				public boolean onSingleTapConfirmed(MotionEvent e) {
 					Log.i(LOG_TAG,
 							"could invoke something else on one tab because double tab was not proper");
-					run=+1;
-					
+					getRandomTrack();
 					return false;
 				}
 			});
@@ -297,8 +319,9 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				mTrackListLoader.cancel(true);
 			}
 			isDestroyed = true;
-			run=0;
+			run = 0;
 			mHandler.removeCallbacks(mDrawWaveFrameRunnable);
+			mHandlerTrack.removeCallbacks(mNextRun);
 		}
 
 		@Override
@@ -336,6 +359,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			// TODO Auto-generated method stub
 			super.onSurfaceDestroyed(holder);
 			mHandler.removeCallbacks(mDrawWaveFrameRunnable);
+			mHandlerTrack.removeCallbacks(mNextRun);
+
 		}
 
 		@Override
@@ -349,7 +374,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 			super.onTouchEvent(event);
 			Log.i(LOG_TAG, "on touch -> " + event);
-			
+
 			mGestureDetector.onTouchEvent(event);
 		}
 
@@ -409,6 +434,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				drawWavePic();
 			} else {
 				mHandler.removeCallbacks(mDrawWaveFrameRunnable);
+				mHandlerTrack.removeCallbacks(mNextRun);
+
 			}
 		}
 
@@ -471,62 +498,62 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		protected void onPostExecute(List<Tracks> result) {
 			Log.i(LOG_TAG, "done and post execute");
 
-			new GetBitmap(result.get(0).waveformUrl, mDrawManager).execute();
-			super.onPostExecute(result);
+//			new GetBitmap(result.get(run).waveformUrl, mDrawManager).execute();
+//			super.onPostExecute(result);
 
 		}
 	}
 
-	private static class GetBitmap extends AsyncTask<Void, Void, Bitmap> {
-
-		final static String LOG_TAG = "GetBitMap";
-		private URL mUrl;
-		private WaveFormDrawManager mDrawManager;
-
-		public GetBitmap(final String uri, WaveFormDrawManager drawManager) {
-			mDrawManager = drawManager;
-			try {
-				Log.i(LOG_TAG, "constructor of GetBitmap invoked ");
-
-				mUrl = new URL(uri);
-
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		protected Bitmap doInBackground(Void... params) {
-			Bitmap result = null;
-			if (mUrl != null) {
-				HttpURLConnection connection;
-				try {
-					Log.i(LOG_TAG, " Bitmap fetch ");
-					connection = (HttpURLConnection) mUrl.openConnection();
-					connection.setDoInput(true);
-					connection.connect();
-					InputStream input = connection.getInputStream();
-					result = BitmapFactory.decodeStream(input);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			}
-			Log.i(LOG_TAG, "result");
-
-			return result;
-
-		}
-
-		@Override
-		protected void onPostExecute(Bitmap result) {
-			super.onPostExecute(result);
-			Log.i(LOG_TAG, "done and post execute");
-
-			mDrawManager.setBitmap(result);
-
-		}
-	}
+//	private static class GetBitmap extends AsyncTask<Void, Void, Bitmap> {
+//
+//		final static String LOG_TAG = "GetBitMap";
+//		private URL mUrl;
+//		private WaveFormDrawManager mDrawManager;
+//
+//		public GetBitmap(final String uri, WaveFormDrawManager drawManager) {
+//			mDrawManager = drawManager;
+//			try {
+//				Log.i(LOG_TAG, "constructor of GetBitmap invoked ");
+//
+//				mUrl = new URL(uri);
+//
+//			} catch (MalformedURLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//
+//		@Override
+//		protected Bitmap doInBackground(Void... params) {
+//			Bitmap result = null;
+//			if (mUrl != null) {
+//				HttpURLConnection connection;
+//				try {
+//					Log.i(LOG_TAG, " Bitmap fetch ");
+//					connection = (HttpURLConnection) mUrl.openConnection();
+//					connection.setDoInput(true);
+//					connection.connect();
+//					InputStream input = connection.getInputStream();
+//					result = BitmapFactory.decodeStream(input);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//
+//			}
+//			Log.i(LOG_TAG, "result" + result);
+//
+//			return result;
+//
+//		}
+//
+//		@Override
+//		protected void onPostExecute(Bitmap result) {
+//			super.onPostExecute(result);
+//			Log.i(LOG_TAG, "done and post execute");
+//
+//			mDrawManager.setBitmap(result);
+//
+//		}
+//	}
 }

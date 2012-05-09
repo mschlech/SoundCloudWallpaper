@@ -1,5 +1,10 @@
 package com.example.soundcloud.challange.api;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +16,8 @@ import org.json.JSONObject;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.example.soundcloud.challange.data.Tracks;
@@ -225,7 +232,7 @@ public class SoundCloudApi {
 
 			HttpResponse soundCloudResponse = apiWrapper.get(requestResource);
 
-			if (soundCloudResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+			if (soundCloudResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK ) {
 				final String jsonString = Http.getString(soundCloudResponse);
 				jsonArray = new JSONArray(jsonString);
 				for (int i = 0; i < jsonArray.length(); i++) {
@@ -254,7 +261,8 @@ public class SoundCloudApi {
 					} else {
 						tracks.permalink_url = "www.soundcloud.com";
 					}
-
+						tracks.waveFormURLPng = getBitmapFromSoundCloud(tracks.waveformUrl);
+					
 					if ((String) jsonArray.getJSONObject(i).getString("genre") != null) {
 						tracks.genre = (String) jsonArray.getJSONObject(i)
 								.getString("genre");
@@ -281,7 +289,39 @@ public class SoundCloudApi {
 		return trackList;
 
 	}
+	private static Bitmap getBitmapFromSoundCloud(String url) {
+		Log.i(LOG_TAG," fetcing bitmap in sourcloudapi");
+		URL mUrl =null;
+		try {
+			mUrl = new URL(url);
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} finally {
 
+		}
+		Bitmap result = null;
+		if (url != null) {
+			HttpURLConnection connection;
+			try {
+				Log.i(LOG_TAG, " Bitmap fetch ");
+				connection = (HttpURLConnection) mUrl.openConnection();
+				connection.setDoInput(true);
+				connection.connect();
+				InputStream input = connection.getInputStream();
+				result = BitmapFactory.decodeStream(input);
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		Log.i(LOG_TAG, "result");
+
+		return result;
+
+	}
 	/**
 	 * @return
 	 * @throws Exception

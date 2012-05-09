@@ -1,11 +1,12 @@
 package com.example.soundcloud.challange.data;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
  * marcus SoundCloudTrial
- * <p/>
+ * not necesssarily a parelable needed . 
  * 30.04.2012
  */
 public class Tracks implements Parcelable {
@@ -61,6 +62,7 @@ public class Tracks implements Parcelable {
     public String waveformUrl;
     public String permalink_url;
     public String genre;
+    public Bitmap waveFormURLPng;
 
     
     public Tracks() {
@@ -76,6 +78,7 @@ public class Tracks implements Parcelable {
         this.waveformUrl = source.readString();
         this.permalink_url = source.readString();
         this.genre = source.readString();
+       // this.waveFormURL =source.readByte();
 
     }
 
