@@ -6,6 +6,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.example.soundcloud.challange.data.Tracks;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -19,6 +23,10 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
+import android.text.DynamicLayout;
+import android.text.Layout.Alignment;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
@@ -35,17 +43,28 @@ public class WaveFormDrawManager {
 	private Bitmap mWaveformBitmap;
 	private Bitmap mSoundCloudLogoBitmap;
 
-	private final Paint mTextPaint;
+	private final TextPaint mTextPaint;
 	private final Paint mRectPaint;
 	private final Paint mWaveFormPaint;
 	private final Paint mSoundCloudLogoPaint;
 
+	/**
+	 * get the actual information of the passed text object
+	 */
+	private Tracks mTrack;
+	private boolean isLayoutValid = true;
+
 	private int mCenterY;
 	private int mCenterX;
 
-	private static long TIME_OFFSET = System.currentTimeMillis();
+	private long TIME_OFFSET = System.currentTimeMillis();
 
 	private final Rect mRect = new Rect();
+	private final Rect mTextBounds = new Rect();
+	/**
+	 * textlayout helper class
+	 */
+	private List<StaticLayout> mStaticLayoutList = new ArrayList<StaticLayout>();
 
 	private float mDensity = 1;
 
@@ -56,6 +75,10 @@ public class WaveFormDrawManager {
 	private URL mUrl;
 
 	private Context mContext;
+
+	private int mWidth;
+
+	private int mHeight;
 
 	/**
 	 * default constructor defining the style static initializer
@@ -80,7 +103,7 @@ public class WaveFormDrawManager {
 		/**
 		 * optional task to display the trackname / url on the homescreen
 		 */
-		mTextPaint = new Paint() {
+		mTextPaint = new TextPaint() {
 			{
 				setTextSize(30f);
 				setColor(Color.rgb(255, 255, 240));
@@ -185,12 +208,16 @@ public class WaveFormDrawManager {
 	 * @param c
 	 *            a Canvas to draw on
 	 */
-	public void onDraw(final Canvas c, String genre, String title,Bitmap waveFormUrlPng,
-			String permalink_url) {
-		Log.i(LOG_TAG, "genre = " + genre + " title " + title
-				+ " permalink_url " + permalink_url);
-		//mWaveformBitmap = getBitmapFromSoundCloud(waveformUrl);
-		mWaveformBitmap = waveFormUrlPng;
+	public void onDraw(final Canvas c) {
+
+		if (!isLayoutValid) {
+			createTextLayout();
+		}
+		// mWaveformBitmap = getBitmapFromSoundCloud(waveformUrl);
+		if(mTrack==null){
+			return;
+		}
+		mWaveformBitmap = mTrack.waveFormURLPng;
 
 		c.drawColor(Color.BLACK);
 		final int translateY = mCenterY - mWaveformBitmap.getHeight() / 2;
@@ -213,46 +240,66 @@ public class WaveFormDrawManager {
 		/**
 		 * permanent moving value between -1 and 1
 		 */
-		final double time = System.currentTimeMillis() - TIME_OFFSET;
+		final double time = ((System.currentTimeMillis() - TIME_OFFSET) * 1F) / 1000;
 		final double scale = (Math.sin(time) + 1) * 8 * mDensity;
+		final String LOGSCALE = String.format("%.2f", scale);
+		// Log.i(LOG_TAG, "Scale " + LOGSCALE + " " + time);
+
 		mTextPaint.setMaskFilter(new BlurMaskFilter((float) scale, Blur.SOLID));
 
 		/**
 		 * rotate and flying text
 		 */
-		// long et = SystemClock.elapsedRealtime();
-		// float mXrotation = ((float) (et - TIME_OFFSET)) / 1000;
-		// float mYrotation = ((float) (0.5f - mCenterY) * 2.0f);
-		// float newY = (float) (Math.sin(mXrotation) * (mCenterX) + Math
-		// .cos(mXrotation) * (mCenterY));
-		//
-		// float newZ = (float) (Math.cos(mXrotation) * mCenterX - Math
-		// .sin(mXrotation) * mCenterY);
-		//
-		// float newX = (float)(Math.sin(mYrotation) * newZ +
-		// Math.cos(mYrotation) * mXrotation);
-		// newZ = (float)(Math.cos(mYrotation) * newZ - Math.sin(mYrotation) *
-		// mXrotation);
-
+		// radians to pi 180/Math.pi
+		float degree = (float) (Math.sin(time) * (180 / Math.PI));
+		/**
+		 * display the container segments for the texts
+		 */
+		for (int i = 0; i < mStaticLayoutList.size(); i++) {
+			/**
+			 * d = change signed and unsigned 1
+			 */
+			float d = (float)((degree/3)*Math.pow(-1, i%2));
+			drawText(mStaticLayoutList.get(i), d, 0, i * 30 + 20, c);
+		}
 		/**
 		 * optional task to display the trackname / url on the homescreen
 		 */
-//		int x = (int) ((int) (300) + (Math.sin(time) + 1) * 2);
-//		int y = (int) ((int) (400) + (Math.sin(time) + 1) * 2);
-//		Rect rect = new Rect();
-//		mTextPaint.getTextBounds(genre, 0, genre.length(), rect);
-//		c.translate(x, y);
-//		mTextPaint.setStyle(Paint.Style.FILL);
-//
-//		c.translate(-x, -y);
-//		c.rotate(-45, x + rect.exactCenterX(), y + rect.exactCenterY());
-//		mTextPaint.setStyle(Paint.Style.FILL);
-//		mTextPaint.setFakeBoldText(true);
-//		c.drawText(genre, x, y, mTextPaint);
 
-		c.drawText(genre, 100, 100, mTextPaint);
-		c.drawText(title, 140, 140, mTextPaint);
-		c.drawText(permalink_url, 180, 180, mTextPaint);
+	}
+
+	/**
+	 * choose different mTextPaint for each text to display
+	 */
+	private void createTextLayout() {
+		if (mTrack != null) {
+			mStaticLayoutList.clear();
+
+			mStaticLayoutList.add(new StaticLayout(mTrack.trackName,
+					mTextPaint, mWidth, Alignment.ALIGN_CENTER, 1, 0, false));
+			mStaticLayoutList.add(new StaticLayout(mTrack.genre, mTextPaint,
+					mWidth, Alignment.ALIGN_CENTER, 1, 0, false));
+			mStaticLayoutList.add(new StaticLayout(mTrack.permalink_url,
+					mTextPaint, mWidth, Alignment.ALIGN_CENTER, 1, 0, false));
+
+		}
+	}
+
+	/**
+	 * avoid gc by preallocated rect and not returning a rect.
+	 * 
+	 * @param text
+	 * @param outBounds
+	 *            defines geometry text object
+	 */
+	private void drawText(final StaticLayout staticLayout, final float degrees,
+			final int x, final int y, final Canvas c) {
+		c.save();
+		c.translate(x, y);
+
+		c.rotate(degrees, mCenterX-x, staticLayout.getHeight()/2);
+		staticLayout.draw(c);
+		c.restore();
 
 	}
 
@@ -271,6 +318,12 @@ public class WaveFormDrawManager {
 
 	}
 
+	public void setTrack(Tracks track) {
+		mTrack = track;
+		isLayoutValid = false;
+
+	}
+
 	/**
 	 * some visual effects to manipulate the image
 	 * 
@@ -278,7 +331,12 @@ public class WaveFormDrawManager {
 	 * @param height
 	 */
 	public void onSizedChanged(final int width, final int height) {
+		isLayoutValid = false;
+		mWidth = width;
+		mHeight = height;
 		mCenterY = height / 2;
+		mCenterX = width/2;
+		
 		if (mWaveformBitmap != null) {
 			mRect.set(0, 0, width, mWaveformBitmap.getHeight());
 
