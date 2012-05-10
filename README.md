@@ -1,11 +1,9 @@
 SoundCloudWallpaper
 ===================
 
-#SoundCloudWallpaper
 
-
-![Screenshot 1](https://github.com/mschlech/SoundCloudWallpaper/pics/liveScreen1.png)
-![Screenshot 1](https://github.com/mschlech/SoundCloudWallpaper/pics/preferences1.png)
+![HomeScreen](https://github.com/mschlech/SoundCloudWallpaper/pics/soundcloudwallpaper1.png.png)
+![HomeScreen surfing on soundcloud wave](https://github.com/mschlech/SoundCloudWallpaper/pics/preferences1.png)
 
 
 A LiveWallpaper which retrieves SoundCloud tracks or favorites . 
