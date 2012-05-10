@@ -53,7 +53,7 @@ public class WaveFormDrawManager implements AnimatorListener {
 	private Animator mTextInAnimator;
 	private Tracks mLastTrack;
 	private int mTitleColor = Color.WHITE;
-	private int mOwnerColor=Color.WHITE;
+	private int mOwnerColor = Color.WHITE;
 	private ObjectAnimator mTextAnimator;
 	private ObjectAnimator mTextScaleAnimator;
 	private int mYPosTitle, mYPosOwner, mYPosLogo;
@@ -75,7 +75,8 @@ public class WaveFormDrawManager implements AnimatorListener {
 	private StaticLayout mStaticLayoutLastTitle;
 	private StaticLayout mStaticLayoutLastOwner;
 
-	private final static int[] COLORS = { 0, Color.rgb(255, 127, 0), 0xffffffff, Color.rgb(255, 127, 0), 0 };
+	private final static int[] COLORS = { 0, Color.rgb(255, 127, 0),
+			0xffffffff, Color.rgb(255, 127, 0), 0 };
 	private final static float[] POSITIONS = { 0, 0.3f, 0.5f, 0.7f, 1 };
 
 	private int mWidth;
@@ -135,7 +136,8 @@ public class WaveFormDrawManager implements AnimatorListener {
 	 */
 	public void onCreate(final Context context) {
 
-		WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+		WindowManager windowManager = (WindowManager) context
+				.getSystemService(Context.WINDOW_SERVICE);
 		DisplayMetrics metrics = new DisplayMetrics();
 		windowManager.getDefaultDisplay().getMetrics(metrics);
 		/**
@@ -144,7 +146,8 @@ public class WaveFormDrawManager implements AnimatorListener {
 		mTextPaint.setTextSize(24 * metrics.density);
 
 		if (mSoundCloudLogoBitmap == null) {
-			mSoundCloudLogoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.soundcloudlogo);
+			mSoundCloudLogoBitmap = BitmapFactory.decodeResource(
+					context.getResources(), R.drawable.soundcloudlogo);
 		}
 	}
 
@@ -181,7 +184,7 @@ public class WaveFormDrawManager implements AnimatorListener {
 		/* draw logo */
 		c.save();
 
-		final float scale = (mWidth*1f) / mEngine.getDesiredMinimumWidth();
+		final float scale = (mWidth * 1f) / mEngine.getDesiredMinimumWidth();
 		final float pos = Math.abs(mScrollOffset) * scale;
 		c.translate(pos, mYPosLogo);
 		// c.translate(mWidth - mSoundCloudLogoBitmap.getWidth(), mYPosLogo);
@@ -191,17 +194,19 @@ public class WaveFormDrawManager implements AnimatorListener {
 		/* draw title */
 		c.save();
 		c.translate(mCurrentTextPosition, mStaticLayoutTitle.getHeight());
-		c.scale(mTitleSize, mTitleSize, mWidth/2, mStaticLayoutTitle.getHeight()/2);
+		c.scale(mTitleSize, mTitleSize, mWidth / 2,
+				mStaticLayoutTitle.getHeight() / 2);
 		mTextPaint.setColor(mTitleColor);
-		mStaticLayoutTitle.draw(c,null,mTextPaint,0);		
+		mStaticLayoutTitle.draw(c, null, mTextPaint, 0);
 		c.restore();
 
 		if (mStaticLayoutLastTitle != null && mLastTrack != null) {
 			c.save();
 			c.translate(mLastTextPosition, mStaticLayoutLastTitle.getHeight());
-			c.scale(mTitleSize, mTitleSize, mWidth/2, mStaticLayoutLastTitle.getHeight()/2);
+			c.scale(mTitleSize, mTitleSize, mWidth / 2,
+					mStaticLayoutLastTitle.getHeight() / 2);
 			mTextPaint.setColor(mTitleColor);
-			mStaticLayoutLastTitle.draw(c,null,mTextPaint,0);		
+			mStaticLayoutLastTitle.draw(c, null, mTextPaint, 0);
 			c.restore();
 		}
 
@@ -209,17 +214,19 @@ public class WaveFormDrawManager implements AnimatorListener {
 		if (mStaticLayoutOwner != null) {
 			c.save();
 			c.translate(mCurrentTextPosition, mYPosTitle);
-			c.scale(mOwnerSize, mOwnerSize, mWidth/2, mStaticLayoutOwner.getHeight()/2);
+			c.scale(mOwnerSize, mOwnerSize, mWidth / 2,
+					mStaticLayoutOwner.getHeight() / 2);
 			mTextPaint.setColor(mOwnerColor);
-			mStaticLayoutOwner.draw(c,null,mTextPaint,0);
+			mStaticLayoutOwner.draw(c, null, mTextPaint, 0);
 			c.restore();
 		}
 		if (mStaticLayoutLastOwner != null && mLastTrack != null) {
 			c.save();
 			c.translate(mLastTextPosition, mYPosTitle);
-			c.scale(mOwnerSize, mOwnerSize, mWidth/2, mStaticLayoutLastOwner.getHeight()/2);
+			c.scale(mOwnerSize, mOwnerSize, mWidth / 2,
+					mStaticLayoutLastOwner.getHeight() / 2);
 			mTextPaint.setColor(mOwnerColor);
-			mStaticLayoutLastOwner.draw(c,null,mTextPaint,0);
+			mStaticLayoutLastOwner.draw(c, null, mTextPaint, 0);
 			c.restore();
 		}
 
@@ -228,22 +235,37 @@ public class WaveFormDrawManager implements AnimatorListener {
 
 	}
 
+	/**
+	 * check which region is taped and initialize the appropriate color aninmation.
+	 * 
+	 * @param x the x coordinate of the issued tab event
+	 * @param y the y coordinate of the issued tab event
+	 * @return
+	 */
 	public boolean onTap(final float x, final float y) {
 		final int index = (int) ((Math.random() * 100) % 3);
 		Log.i(LOG_TAG, "new animation type = " + index);
 		/* hit test: which text was tapped? */
 		if (y < mYPosTitle) {
-			initColorAnimation("titleColor","titleSize");
+			initColorAnimation("titleColor", "titleSize");
 			return true;
 
 		} else if (y < mYPosOwner) {
-			initColorAnimation("ownerColor","ownerSize");
+			initColorAnimation("ownerColor", "ownerSize");
 			return true;
 		}
 		return false;
 	}
 
-	private void initColorAnimation(final String propertyName,final String sizeProperty) {
+	/**
+	 * 
+	 * @param propertyName String 
+	 *            propertyname of the setter funktion to invoke. set the appropriate property
+	 *            for Username oder titlename in the text aninmation process
+	 * @param sizeProperty
+	 */
+	private void initColorAnimation(final String propertyName,
+			final String sizeProperty) {
 		if (mTextAnimator != null && mTextAnimator.isRunning()) {
 			mTextAnimator.addListener(new AnimatorListener() {
 
@@ -262,18 +284,21 @@ public class WaveFormDrawManager implements AnimatorListener {
 
 				@Override
 				public void onAnimationCancel(Animator animation) {
-					startAnimation(propertyName,sizeProperty);
+					startAnimation(propertyName, sizeProperty);
 				}
 			});
 			mTextAnimator.cancel();
 		}
-		startAnimation(propertyName,sizeProperty);
+		startAnimation(propertyName, sizeProperty);
 	}
 
-	private void startAnimation(final String propertyName, final String sizeProperty) {
-		mTextAnimator = ObjectAnimator.ofInt(this, propertyName, Color.WHITE, Color.RED);						
-		mTextScaleAnimator = ObjectAnimator.ofFloat(this, sizeProperty, 1, 1.2f);
-		
+	private void startAnimation(final String propertyName,
+			final String sizeProperty) {
+		mTextAnimator = ObjectAnimator.ofInt(this, propertyName, Color.WHITE,
+				Color.RED);
+		mTextScaleAnimator = ObjectAnimator
+				.ofFloat(this, sizeProperty, 1, 1.2f);
+
 		mTextAnimator.setEvaluator(new ArgbEvaluator());
 		AnimatorSet set = new AnimatorSet();
 		set.playTogether(mTextAnimator, mTextScaleAnimator);
@@ -283,19 +308,21 @@ public class WaveFormDrawManager implements AnimatorListener {
 		mTextScaleAnimator.setRepeatCount(1);
 		mTextScaleAnimator.setRepeatMode(ObjectAnimator.REVERSE);
 		set.start();
-}
-	
-	private float mTitleSize=1;
-	private float mOwnerSize=1;
-	public void setTitleSize(final float size){
+	}
+
+	private float mTitleSize = 1;
+	private float mOwnerSize = 1;
+
+	public void setTitleSize(final float size) {
 		mTitleSize = size;
 	}
-	public void setOwnerSize(final float size){
+
+	public void setOwnerSize(final float size) {
 		mOwnerSize = size;
 	}
 
 	public void setTitleColor(final int color) {
-		Log.i(LOG_TAG,"setTitleColor" + color);
+		Log.i(LOG_TAG, "setTitleColor" + color);
 		mTitleColor = color;
 		mEngine.scheduleDraw();
 	}
@@ -313,11 +340,13 @@ public class WaveFormDrawManager implements AnimatorListener {
 		if (mTrack != null) {
 
 			mStaticLayoutLastTitle = mStaticLayoutTitle;
-			mStaticLayoutTitle = new StaticLayout(mTrack.trackName, mTextPaint, mWidth, Alignment.ALIGN_CENTER, 1, 0, false);
+			mStaticLayoutTitle = new StaticLayout(mTrack.trackName, mTextPaint,
+					mWidth, Alignment.ALIGN_CENTER, 1, 0, false);
 
 			if (mTrack.userName != null) {
 				mStaticLayoutLastOwner = mStaticLayoutOwner;
-				mStaticLayoutOwner = new StaticLayout(mTrack.userName, mTextPaint, mWidth, Alignment.ALIGN_CENTER, 1, 0, false);
+				mStaticLayoutOwner = new StaticLayout(mTrack.userName,
+						mTextPaint, mWidth, Alignment.ALIGN_CENTER, 1, 0, false);
 			}
 
 			final float startHeight = mHeight * 0.80f;
@@ -364,15 +393,20 @@ public class WaveFormDrawManager implements AnimatorListener {
 			final int x2 = x1;
 			// a linear gradient beginning from left right corner to right down
 			// corner
-			mRectPaint.setShader((new LinearGradient(x1, y1, x2, y2, COLORS, POSITIONS, TileMode.CLAMP)));
+			mRectPaint.setShader((new LinearGradient(x1, y1, x2, y2, COLORS,
+					POSITIONS, TileMode.CLAMP)));
 			// start fade in and fade out animation
-			mFadeInAnimator = ObjectAnimator.ofFloat(this, "currentAlpha", 0, 1);
+			mFadeInAnimator = ObjectAnimator
+					.ofFloat(this, "currentAlpha", 0, 1);
 			mFadeOutAnimator = ObjectAnimator.ofFloat(this, "lastAlpha", 1, 0);
-			mTextInAnimator = ObjectAnimator.ofFloat(this, "currentTextPosition", mWidth, 0);
-			mTextOutAnimator = ObjectAnimator.ofFloat(this, "lastTextPosition", 0, -mWidth);
+			mTextInAnimator = ObjectAnimator.ofFloat(this,
+					"currentTextPosition", mWidth, 0);
+			mTextOutAnimator = ObjectAnimator.ofFloat(this, "lastTextPosition",
+					0, -mWidth);
 
 			AnimatorSet set = new AnimatorSet();
-			set.playTogether(mFadeInAnimator, mFadeOutAnimator, mTextInAnimator, mTextOutAnimator);
+			set.playTogether(mFadeInAnimator, mFadeOutAnimator,
+					mTextInAnimator, mTextOutAnimator);
 			set.setDuration(1000);
 
 			set.addListener(this);
