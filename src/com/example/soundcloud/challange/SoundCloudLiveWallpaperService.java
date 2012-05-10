@@ -72,6 +72,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		private String soundCloudSource = mPrefs.getString("source", "tracks");
 
+		private boolean enableDownloadFeature = mPrefs.getBoolean("enableDownload", false);
+
 		private TrackListLoader mTrackListLoader;
 
 		private boolean mVisible;
@@ -108,7 +110,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			soundCloudSource = sharedPreferences.getString("source", "tracks");
 
 			mCurrentTrackIndex = 0;
-			Log.i(LOG_TAG, "On Preference changed =>" + soundCloudUser  );
+			Log.i(LOG_TAG, "On Preference changed =>" + soundCloudUser);
 			drawWavePic();
 		}
 
@@ -355,15 +357,35 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		@Override
 		public boolean onDown(MotionEvent arg0) {
-			// TODO Auto-generated method stub
+
 			return false;
 		}
 
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 				float velocityY) {
-			// TODO Auto-generated method stub
-			return false;
+			Log.i(LOG_TAG,
+					"on fling captured X= " + e1.getX() + " Y= " + e2.getY()
+							+ " velocityX" + velocityX + " velocityY "
+							+ velocityY);
+			/**
+			 * prevent download when dragging the system tray down
+			 */
+			if ((Math.abs(e1.getY()) - Math.abs(e2.getY()) > 250)) {
+				Log.i(LOG_TAG, "out of range");
+				return false;
+			}
+			if (Math.abs(e2.getY()) - Math.abs(e2.getX()) > 180) {
+				if (enableDownloadFeature=true) {
+					Log.i(LOG_TAG,
+							" captured appropriate movement for new download ");
+					mHandler.removeCallbacks(mDrawWaveFrameRunnable);
+					new TrackListLoader(this).execute();
+				}
+
+			}
+			return true;
+
 		}
 
 		@Override
@@ -399,7 +421,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				Log.i(LOG_TAG,
 						"onVisibilityChanged is true so invoke the drawWavePic method");
 				mIsUpdating = true;
-				
+
 				drawWavePic();
 				mHandler.removeCallbacks(mNextRun);
 				mHandler.post(mNextRun);

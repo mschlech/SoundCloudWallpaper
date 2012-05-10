@@ -28,10 +28,12 @@ setting manually the source where to get soundcloud content ( tracks/resource ) 
  * one tap gets randomly to the next track with its information.
  * double tap on the homescreen opens the displayed soundfile in a browser on (http://www.soundcloud.com)
    or opens the soundcloud app if installed.
+ * Preferences to enable user initiated download swipe down the soundcloud logo.
+ 
 
 ## Installation
- * Installtion can be done via your favourite IDE (Eclipse intellij), command line android tool or copying apk on the sdcard (which is not
-   tested)
+ * Installtion can be done via your favorite IDE (Eclipse, intellij which runs an android environment),
+   command line android tool or copying apk on the sdcard (which is not tested)
  
 ## Limitation
  * tracks being private cannot be invoked and passed to a subsequent intent ( browser or app invocation which has a different user ) which is ok, but it is not 

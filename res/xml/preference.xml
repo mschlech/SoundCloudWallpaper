@@ -5,8 +5,11 @@
         android:key="soundcloudcredentials"
         android:title="sound cloud network credentials" >
         <CheckBoxPreference
-            android:key="touch"
-            android:title="Enable Touch" >
+            android:defaultValue="true"
+            android:key="enableDownload"
+            android:summaryOn="true"
+            android:summary="swipe down the the soundcloud logo to get updates from soundcloud"
+            android:title="Enable download feature" >
         </CheckBoxPreference>
 
         <EditTextPreference
@@ -21,8 +24,8 @@
             android:key="password"
             android:title="Password" >
         </EditTextPreference>
-        
-         <ListPreference
+
+        <ListPreference
             android:defaultValue="tracks"
             android:dialogIcon="@drawable/soundcloudlogo"
             android:dialogMessage="favorites or tracks"
@@ -46,9 +49,11 @@
             android:summary="set the resource name from which sound cloud resource to fetch the data"
             android:title="resource name of sound cloud" >
         </EditTextPreference>
-        -->
+    -->
 
-       <!--  <ListPreference
+
+    <!--
+    <ListPreference
             android:defaultValue="tracks"
             android:dialogIcon="@drawable/soundcloudlogo"
             android:dialogMessage="favorites or tracks"
@@ -58,6 +63,7 @@
             android:key="source"
             android:summary="set the resource name from which sound cloud resource to fetch the data"
             android:title="tracks or favorites" />
-    </PreferenceCategory> -->
+    </PreferenceCategory>
+    -->
 
 </PreferenceScreen>
