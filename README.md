@@ -1,14 +1,16 @@
 SoundCloudWallpaper
 ===================
+A LiveWallpaper which retrieves SoundCloud tracks or favorites of a sound cloud user. 
+
 
 ## Screenshots on a low end aldi mobile
 ![HomeScreen](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudwallpaper1.png)
+A homescreen wiht the livewallpaper
 ![HomeScreen surfing on soundcloud wave](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudpressbelowTitle.png)
+sliding from one virtual screen to another following the waveform
 ![HomeScreen resource settings tracks or favorites](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudresourcesettings.png)
-
-
-A LiveWallpaper which retrieves SoundCloud tracks or favorites of a sound cloud user. 
-
+setting manually the source where to get soundcloud content ( tracks/resource ) more to come.
+ 
 ## Dependencies
 
  * Add android-support-v4.jar
@@ -28,23 +30,8 @@ A LiveWallpaper which retrieves SoundCloud tracks or favorites of a sound cloud 
    or opens the soundcloud app if installed.
 
 ## Installation
- * Installtion can be done via your favourite IDE, command line android tool copying apk on the sdcard (which is not
+ * Installtion can be done via your favourite IDE (Eclipse intellij), command line android tool or copying apk on the sdcard (which is not
    tested)
-
-### Layout
-
-``` xml
-<!--
-  
--->
-```
-
-Yobla:
-
-``` xml
-
-```
-
  
 
 ### LiveWallpaper
