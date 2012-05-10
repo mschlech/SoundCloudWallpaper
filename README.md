@@ -1,12 +1,13 @@
 SoundCloudWallpaper
 ===================
 
+## Screenshots on a low end aldi mobile
+![HomeScreen](https://github.com/mschlech/SoundCloudWallpaper/tree/master/pics/soundcloudwallpaper1.png)
+![HomeScreen surfing on soundcloud wave](https://github.com/mschlech/SoundCloudWallpaper/blob/master/pics/soundcloudpressbelowTitle.png)
+![HomeScreen resource settings tracks or favorites](https://github.com/mschlech/SoundCloudWallpaper/blob/master/pics/soundcloudresourcesettings.png)
 
-![HomeScreen](https://github.com/mschlech/SoundCloudWallpaper/pics/soundcloudwallpaper1.png.png)
-![HomeScreen surfing on soundcloud wave](https://github.com/mschlech/SoundCloudWallpaper/pics/preferences1.png)
 
-
-A LiveWallpaper which retrieves SoundCloud tracks or favorites . 
+A LiveWallpaper which retrieves SoundCloud tracks or favorites of a sound cloud user. 
 
 ## Dependencies
 
