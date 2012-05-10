@@ -9,8 +9,8 @@ package com.example.soundcloud.challange;
 
 public final class R {
     public static final class array {
-        public static final int sourceKey=0x7f050000;
-        public static final int sourceValue=0x7f050001;
+        public static final int sourcekey=0x7f050000;
+        public static final int sourcevalue=0x7f050001;
     }
     public static final class attr {
     }
@@ -18,7 +18,9 @@ public final class R {
         public static final int gradient=0x7f020000;
         public static final int ic_launcher=0x7f020001;
         public static final int soundcloudlogo=0x7f020002;
-        public static final int testwave=0x7f020003;
+        public static final int soundcloudlogochallange=0x7f020003;
+        public static final int soundcloudlogochallenge=0x7f020004;
+        public static final int testwave=0x7f020005;
     }
     public static final class id {
         public static final int settings_text_view=0x7f070000;

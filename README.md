@@ -1,9 +1,9 @@
 SoundCloudWallpaper
 ===================
-A LiveWallpaper which retrieves SoundCloud tracks or favorites of a sound cloud user. 
+##A LiveWallpaper which retrieves SoundCloud tracks or favorites of a sound cloud user. 
 
 
-## Screenshots on a low end aldi mobile
+# Screenshots on a low end aldi mobile
 ![HomeScreen](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudwallpaper1.png)
 A homescreen wiht the livewallpaper
 ![HomeScreen surfing on soundcloud wave](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudpressbelowTitle.png)
@@ -12,7 +12,7 @@ sliding from one virtual screen to another following the waveform
 setting manually the source where to get soundcloud content ( tracks/resource ) more to come.
  
 ## Dependencies
-
+ * requires Android 2.3.3 
  * Add android-support-v4.jar
  * Add java-api-wrapper (https://github.com/soundcloud/java-api-wrapper) as a library project
  * Add nineoldandroids (http://nineoldandroids.com/
@@ -33,6 +33,9 @@ setting manually the source where to get soundcloud content ( tracks/resource ) 
  * Installtion can be done via your favourite IDE (Eclipse intellij), command line android tool or copying apk on the sdcard (which is not
    tested)
  
+## Limitation
+ * tracks being private cannot be invoked and passed to a subsequent intent ( browser or app invocation which has a different user ) which is ok, but it is not 
+   blocked or notified upfront in the soundcloud wallpaper.
 
 ### LiveWallpaper
 

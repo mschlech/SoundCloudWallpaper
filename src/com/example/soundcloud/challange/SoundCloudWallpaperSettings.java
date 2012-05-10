@@ -3,9 +3,11 @@ package com.example.soundcloud.challange;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -20,15 +22,19 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+		getPreferenceManager().setSharedPreferencesName(SoundCloudLiveWallpaperService.SOUNDCLOUD_SETTINGS);
 		addPreferencesFromResource(R.xml.preference);
-
-		Preference loginPreference = getPreferenceScreen().findPreference(
+		 getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(
+	                this);
+	
+		 Preference loginPreference = getPreferenceScreen().findPreference(
 				"login");
 
 		Preference passwordPreference = getPreferenceScreen().findPreference(
 				"password");
-		Preference source = getPreferenceScreen().findPreference("source");
-
+		ListPreference source = (ListPreference)getPreferenceScreen().findPreference("source");
+		source.setSummary(source.getEntry());
+		
 		// Add the validator and listener on certain preferences
 		loginPreference.setOnPreferenceChangeListener(loginCheckListener);
 		passwordPreference.setOnPreferenceChangeListener(passwordChecker);
@@ -40,6 +46,7 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 	@Override
 	protected void onResume() {
 		super.onResume();
+	//	getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
@@ -50,14 +57,16 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 	}
 
 	@Override
-	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 		// TODO Auto-generated method stub
+	
 
 	}
-
+//
 	Preference.OnPreferenceChangeListener passwordChecker = new OnPreferenceChangeListener() {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			Log.i("Preferences", " onPreferences Changed");
 			if (newValue != null && newValue.toString().length() > 0) {
 				return true;
 			}
@@ -68,10 +77,12 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 		}
 
 	};
-
+	//
 	Preference.OnPreferenceChangeListener loginCheckListener = new OnPreferenceChangeListener() {
 		@Override
+		
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			Log.i("Preferences"," onPreferences Changed");
 			if (newValue != null && newValue.toString().length() > 0) {
 				return true;
 			}
@@ -87,6 +98,7 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
 			if (newValue != null && newValue.toString().length() > 0) {
+				preference.setSummary(newValue.toString());
 				return true;
 			}
 			Toast.makeText(SoundCloudWallpaperSettings.this,

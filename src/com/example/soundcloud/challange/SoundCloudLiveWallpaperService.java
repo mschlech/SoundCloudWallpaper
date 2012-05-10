@@ -34,7 +34,7 @@ import com.example.soundcloud.challange.data.Tracks;
 public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 	final String LOG_TAG = "SoundCloudLiveWallpaperActivity";
-
+	public static final String SOUNDCLOUD_SETTINGS = "preferences";
 	private Handler mHandler = new Handler();
 	private boolean isDestroyed = false;
 
@@ -58,13 +58,17 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		return new SoundCloudWallpaperEngine();
 	}
 
-	class SoundCloudWallpaperEngine extends Engine implements SharedPreferences.OnSharedPreferenceChangeListener, OnGestureListener {
+	class SoundCloudWallpaperEngine extends Engine implements
+			SharedPreferences.OnSharedPreferenceChangeListener,
+			OnGestureListener {
 
-		private SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(SoundCloudLiveWallpaperService.this);
+		private SharedPreferences mPrefs = PreferenceManager
+				.getDefaultSharedPreferences(SoundCloudLiveWallpaperService.this);
 
 		private String soundCloudUser = mPrefs.getString("login", "mschlech");
 
-		private String soundCloudPassword = mPrefs.getString("password", "linus123");
+		private String soundCloudPassword = mPrefs.getString("password",
+				"linus123");
 
 		private String soundCloudSource = mPrefs.getString("source", "tracks");
 
@@ -83,12 +87,32 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		private boolean mIsUpdating = true;
 
 		SoundCloudWallpaperEngine() {
-			mApiWrapper = new SoundCloudApi(soundCloudUser, soundCloudPassword, soundCloudSource);
+			mApiWrapper = new SoundCloudApi(soundCloudUser, soundCloudPassword,
+					soundCloudSource);
 			mPrefs.registerOnSharedPreferenceChangeListener(this);
 			onSharedPreferenceChanged(mPrefs, null);
 		}
-		
-		public void scheduleDraw(){
+
+		@Override
+		public void onSharedPreferenceChanged(
+				SharedPreferences sharedPreferences, String key) {
+
+			Log.i(LOG_TAG, " Shared Preferences changed ");
+			/**
+			 * which service to fetch user tracks or user favorites
+			 */
+			soundCloudUser = sharedPreferences
+					.getString("login", "mschlech123");
+			soundCloudPassword = sharedPreferences.getString("password",
+					"linus123");
+			soundCloudSource = sharedPreferences.getString("source", "tracks");
+
+			mCurrentTrackIndex = 0;
+			Log.i(LOG_TAG, "On Preference changed =>" + soundCloudUser  );
+			drawWavePic();
+		}
+
+		public void scheduleDraw() {
 			mHandler.removeCallbacks(mDrawWaveFrameRunnable);
 			mHandler.post(mDrawWaveFrameRunnable);
 		}
@@ -107,7 +131,6 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 					holder.unlockCanvasAndPost(c);
 			}
 		}
-
 
 		/**
 		 * 
@@ -174,7 +197,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		}
 
 		@Override
-		public Bundle onCommand(String action, int x, int y, int z, Bundle extras, boolean resultRequested) {
+		public Bundle onCommand(String action, int x, int y, int z,
+				Bundle extras, boolean resultRequested) {
 
 			return super.onCommand(action, x, y, z, extras, resultRequested);
 		}
@@ -223,7 +247,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 					// if the second tap hadn't been released and it's being
 					// moved
 					if (e.getAction() == MotionEvent.ACTION_MOVE) {
-						Log.i(LOG_TAG, " could invoke something else because a movement on the second tab");
+						Log.i(LOG_TAG,
+								" could invoke something else because a movement on the second tab");
 					} else if (e.getAction() == MotionEvent.ACTION_UP)// user
 																		// released
 																		// the
@@ -235,8 +260,10 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 				@Override
 				public boolean onSingleTapConfirmed(MotionEvent e) {
-					Log.i(LOG_TAG, "could invoke something else on one tab because double tab was not proper");
-					if (!mDrawManager.onTap(e.getX(), e.getY())){;
+					Log.i(LOG_TAG,
+							"could invoke something else on one tab because double tab was not proper");
+					if (!mDrawManager.onTap(e.getX(), e.getY())) {
+						;
 						mHandler.removeCallbacks(mNextRun);
 						mHandler.post(mNextRun);
 					}
@@ -248,7 +275,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		@Override
 		public void onDesiredSizeChanged(int desiredWidth, int desiredHeight) {
-		
+
 			// TODO Auto-generated method stub
 			super.onDesiredSizeChanged(desiredWidth, desiredHeight);
 		}
@@ -272,15 +299,19 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		}
 
 		@Override
-		public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
-			super.onOffsetsChanged(xOffset, yOffset, xOffsetStep, yOffsetStep, xPixelOffset, yPixelOffset);
+		public void onOffsetsChanged(float xOffset, float yOffset,
+				float xOffsetStep, float yOffsetStep, int xPixelOffset,
+				int yPixelOffset) {
+			super.onOffsetsChanged(xOffset, yOffset, xOffsetStep, yOffsetStep,
+					xPixelOffset, yPixelOffset);
 
 			mDrawManager.setScrollOffset(xPixelOffset);
 			drawWavePic();
 		}
 
 		@Override
-		public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+		public void onSurfaceChanged(SurfaceHolder holder, int format,
+				int width, int height) {
 			super.onSurfaceChanged(holder, format, width, height);
 			mDrawManager.onSizedChanged(width, height);
 			drawWavePic();
@@ -329,7 +360,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		}
 
 		@Override
-		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+				float velocityY) {
 			// TODO Auto-generated method stub
 			return false;
 		}
@@ -341,7 +373,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		}
 
 		@Override
-		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+		public boolean onScroll(MotionEvent e1, MotionEvent e2,
+				float distanceX, float distanceY) {
 			// TODO Auto-generated method stub
 			return false;
 		}
@@ -363,8 +396,10 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			super.onVisibilityChanged(visible);
 			mVisible = visible;
 			if (mVisible) {
-				Log.i(LOG_TAG, "onVisibilityChanged is true so invoke the drawWavePic method");
+				Log.i(LOG_TAG,
+						"onVisibilityChanged is true so invoke the drawWavePic method");
 				mIsUpdating = true;
+				
 				drawWavePic();
 				mHandler.removeCallbacks(mNextRun);
 				mHandler.post(mNextRun);
@@ -379,20 +414,6 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		public void setTouchEventsEnabled(boolean enabled) {
 			// TODO Auto-generated method stub
 			super.setTouchEventsEnabled(enabled);
-		}
-
-		@Override
-		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
-			Log.i(LOG_TAG, " Shared Preferences changed ");
-			/**
-			 * which service to fetch user tracks or user favorites
-			 */
-			soundCloudUser = sharedPreferences.getString("login", "mschlech123");
-			soundCloudPassword = sharedPreferences.getString("password", "linus123");
-			soundCloudSource = sharedPreferences.getString("source", "tracks");
-
-			mCurrentTrackIndex = 0;
 		}
 
 		public void setTracks(List<Tracks> result) {
@@ -423,14 +444,19 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		protected List<Tracks> doInBackground(Void... params) {
 			try {
 				Log.i(LOG_TAG, "loading the track information");
-				List<Tracks>list =  SoundCloudApi.getMyWaveformUrl(SoundCloudApi.getApiWrapper());
-				for (Tracks track:list){
-					Bitmap scaled = Bitmap.createScaledBitmap(track.waveFormURLPng, mSoundCloudWallpaperEngine.getDesiredMinimumWidth(), track.waveFormURLPng.getHeight(), true);
+				List<Tracks> list = SoundCloudApi
+						.getMyWaveformUrl(SoundCloudApi.getApiWrapper());
+				for (Tracks track : list) {
+					Bitmap scaled = Bitmap
+							.createScaledBitmap(track.waveFormURLPng,
+									mSoundCloudWallpaperEngine
+											.getDesiredMinimumWidth(),
+									track.waveFormURLPng.getHeight(), true);
 					track.waveFormURLPng.recycle();
 					track.waveFormURLPng = scaled;
 				}
 				return list;
-				
+
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.getMessage());
 			}

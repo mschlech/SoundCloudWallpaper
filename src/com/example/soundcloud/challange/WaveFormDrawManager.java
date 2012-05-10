@@ -43,6 +43,7 @@ public class WaveFormDrawManager implements AnimatorListener {
 	// private Bitmap mWaveformBitmap;
 	private Bitmap mSoundCloudLogoBitmap;
 
+	// all about animation and its properties
 	private final TextPaint mTextPaint;
 	private final Paint mRectPaint;
 	private final Paint mWaveFormPaint;
@@ -147,7 +148,7 @@ public class WaveFormDrawManager implements AnimatorListener {
 
 		if (mSoundCloudLogoBitmap == null) {
 			mSoundCloudLogoBitmap = BitmapFactory.decodeResource(
-					context.getResources(), R.drawable.soundcloudlogo);
+					context.getResources(), R.drawable.soundcloudlogochallenge);
 		}
 	}
 
@@ -294,8 +295,8 @@ public class WaveFormDrawManager implements AnimatorListener {
 
 	private void startAnimation(final String propertyName,
 			final String sizeProperty) {
-		mTextAnimator = ObjectAnimator.ofInt(this, propertyName, Color.WHITE,
-				Color.RED);
+		mTextAnimator = ObjectAnimator.ofInt(this, propertyName, Color.rgb(217,217,217),
+				Color.rgb(255,127,0));
 		mTextScaleAnimator = ObjectAnimator
 				.ofFloat(this, sizeProperty, 1, 1.2f);
 
@@ -322,7 +323,6 @@ public class WaveFormDrawManager implements AnimatorListener {
 	}
 
 	public void setTitleColor(final int color) {
-		Log.i(LOG_TAG, "setTitleColor" + color);
 		mTitleColor = color;
 		mEngine.scheduleDraw();
 	}

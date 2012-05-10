@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string-array name="sourceKey">
+    <string-array name="sourcekey">
         <item>get my tracks</item>
         <item>get from my favorites</item>
     </string-array>
-    <string-array name="sourceValue">
-        <item>1</item>
-        <item>2</item>
+    <string-array name="sourcevalue">
+        <item>source</item>
+        <item>source</item>
     </string-array>
-    
 </resources>
