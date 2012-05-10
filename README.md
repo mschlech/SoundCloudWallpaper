@@ -2,7 +2,7 @@ SoundCloudWallpaper
 ===================
 
 ## Screenshots on a low end aldi mobile
-![HomeScreen](https://github.com/mschlech/SoundCloudWallpaper/tree/master/pics/soundcloudwallpaper1.png)
+![Screenshot1](https://github.com/mschlech/SoundCloudWallpaper/tree/master/pics/soundcloudwallpaper1.png)
 ![HomeScreen surfing on soundcloud wave](https://github.com/mschlech/SoundCloudWallpaper/blob/master/pics/soundcloudpressbelowTitle.png)
 ![HomeScreen resource settings tracks or favorites](https://github.com/mschlech/SoundCloudWallpaper/blob/master/pics/soundcloudresourcesettings.png)
 
