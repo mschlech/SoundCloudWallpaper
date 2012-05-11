@@ -8,21 +8,23 @@ SoundCloudWallpaper
 A homescreen with the livewallpaper
 ![HomeScreen surfing on soundcloud wave](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudpressbelowTitle.png)
 Tapping on the title rotates the title, tapping on the track owner fetches randomly the next track. Double tap invokes 
-a mimetype referenced app(like soundcloud app or browser)
+a mimetype referenced app (like soundcloud app or browser)
+ 
+ 
  
 ## Dependencies
- * requires Android 2.3.3 
+ * Requires Android 2.3.3 
  * Add android-support-v4.jar
  * Add java-api-wrapper (https://github.com/soundcloud/java-api-wrapper) as a library project
  * Add nineoldandroids (http://nineoldandroids.com/) as a library project
 
 ## Features
  
- * Obtains the waveform png , track owner and track title via an java-api-wrapper  
+ * Obtains the waveform png, track owner and track title via an java-api-wrapper  
    [SoundCloud Java API wrapper (OAuth2 only)](https://github.com/soundcloud/java-api-wrapper) call against the soundcloud Live system.
  * The track will be selected randomly. The waveform png , the title and the owner will be displayed on the device.
  * (not yet working) selectable source via preference to obtain all tracks or favorites of users soundcloud profile. 
- * Waveform png and additional track information changes from time to time or by a user interaction as described above. 
+ * Waveform png and additional track information changes from time to time or triggered by the user as described above. 
  * Wipe to the next virtual screen of the device will show the next section of the waveform.
  * One tap gets randomly to the next track with its information.
  * Double tap on the homescreen opens the displayed soundfile in a browser on (http://www.soundcloud.com)
@@ -31,11 +33,11 @@ a mimetype referenced app(like soundcloud app or browser)
  
 
 ## Installation
- * Installtion can be done via your favorite IDE (Eclipse, intellij which runs an android environment),
+ * Installation can be done via your favorite IDE (Eclipse, intellij which runs an android environment),
    command line android tool or copying apk on the sdcard (which is not tested)
  
 ## Limitation
- * Tracks being private cannot be invoked to passed to a subsequent intent ( browser or app invocation which has a different user ) which is ok, but it is not 
+ * Tracks being private cannot be invoked to passed to a subsequent intent (browser or app invocation which has a different user) which is ok, but it is not 
    blocked or notified upfront in the soundcloud wallpaper.
  * A limitation of 8 tracks to be kept in memory. (could be configured in the preferences)
  * Preferences are not fully working yet. 
