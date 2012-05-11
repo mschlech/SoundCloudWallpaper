@@ -1,4 +1,4 @@
-package com.example.soundcloud.challange.api;
+package com.example.soundcloud.challenge.api;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +20,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.example.soundcloud.challange.data.Tracks;
+import com.example.soundcloud.challenge.data.Tracks;
 import com.soundcloud.api.ApiWrapper;
 import com.soundcloud.api.Env;
 import com.soundcloud.api.Http;
@@ -50,7 +50,6 @@ public class SoundCloudApi {
 
 	static JSONObject jsonObject;
 	static JSONArray jsonArray;
-	private static String id;
 
 	AccountManager mAccountManager;
 	Account mAccount;
@@ -114,7 +113,6 @@ public class SoundCloudApi {
 			HttpResponse soundCloudResponse = apiWrapper.get(requestResource);
 			// soundCloudResponse.getStatusLine().getStatusCode()
 			jsonObject = Http.getJSON(soundCloudResponse);
-			id = jsonObject.get("id").toString();
 			Log.d(LOG_TAG, "got the response of soundcloud " + jsonObject);
 
 		} catch (Exception e) {

@@ -1,4 +1,4 @@
-package com.example.soundcloud.challange;
+package com.example.soundcloud.challenge;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.net.Uri;
-import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,8 +22,8 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
-import com.example.soundcloud.challange.api.SoundCloudApi;
-import com.example.soundcloud.challange.data.Tracks;
+import com.example.soundcloud.challenge.api.SoundCloudApi;
+import com.example.soundcloud.challenge.data.Tracks;
 
 /**
  * 
@@ -36,10 +35,6 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 	final String LOG_TAG = "SoundCloudLiveWallpaperActivity";
 	public static final String SOUNDCLOUD_SETTINGS = "preferences";
 	private Handler mHandler = new Handler();
-	private boolean isDestroyed = false;
-
-	private AndroidHttpClient ahc;
-
 	public int mCurrentTrackIndex;
 
 	/**
@@ -72,7 +67,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		private String soundCloudSource = mPrefs.getString("source", "tracks");
 
-		private boolean enableDownloadFeature = mPrefs.getBoolean("enableDownload", false);
+		private boolean enableDownloadFeature = mPrefs.getBoolean(
+				"enableDownload", false);
 
 		private TrackListLoader mTrackListLoader;
 
@@ -108,15 +104,17 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			soundCloudPassword = sharedPreferences.getString("password",
 					"linus123");
 			soundCloudSource = sharedPreferences.getString("source", "tracks");
-
+			enableDownloadFeature = sharedPreferences.getBoolean("enableDownload", false);
 			mCurrentTrackIndex = 0;
 			Log.i(LOG_TAG, "On Preference changed =>" + soundCloudUser);
 			drawWavePic();
 		}
 
 		public void scheduleDraw() {
-			mHandler.removeCallbacks(mDrawWaveFrameRunnable);
-			mHandler.post(mDrawWaveFrameRunnable);
+			if (mIsUpdating) {
+				mHandler.removeCallbacks(mDrawWaveFrameRunnable);
+				mHandler.post(mDrawWaveFrameRunnable);
+			}
 		}
 
 		void drawWavePic() {
@@ -172,36 +170,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		}
 
 		@Override
-		public int getDesiredMinimumHeight() {
-			return super.getDesiredMinimumHeight();
-
-		}
-
-		@Override
-		public int getDesiredMinimumWidth() {
-			return super.getDesiredMinimumWidth();
-		}
-
-		@Override
-		public SurfaceHolder getSurfaceHolder() {
-			return super.getSurfaceHolder();
-		}
-
-		@Override
-		public boolean isPreview() {
-			return super.isPreview();
-		}
-
-		@Override
-		public boolean isVisible() {
-			// TODO Auto-generated method stub
-			return super.isVisible();
-		}
-
-		@Override
 		public Bundle onCommand(String action, int x, int y, int z,
 				Bundle extras, boolean resultRequested) {
-
 			return super.onCommand(action, x, y, z, extras, resultRequested);
 		}
 
@@ -220,7 +190,6 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				e.printStackTrace();
 			}
 
-			// Log.i(LOG_TAG, "in onCreate tracks to pass = " + tracks);
 			mDrawManager.onCreate(getApplicationContext());
 
 			/**
@@ -246,17 +215,6 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 				@Override
 				public boolean onDoubleTapEvent(MotionEvent e) {
-					// if the second tap hadn't been released and it's being
-					// moved
-					if (e.getAction() == MotionEvent.ACTION_MOVE) {
-						Log.i(LOG_TAG,
-								" could invoke something else because a movement on the second tab");
-					} else if (e.getAction() == MotionEvent.ACTION_UP)// user
-																		// released
-																		// the
-																		// screen
-					{
-					}
 					return false;
 				}
 
@@ -265,7 +223,6 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 					Log.i(LOG_TAG,
 							"could invoke something else on one tab because double tab was not proper");
 					if (!mDrawManager.onTap(e.getX(), e.getY())) {
-						;
 						mHandler.removeCallbacks(mNextRun);
 						mHandler.post(mNextRun);
 					}
@@ -275,25 +232,16 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		}
 
-		@Override
-		public void onDesiredSizeChanged(int desiredWidth, int desiredHeight) {
-
-			// TODO Auto-generated method stub
-			super.onDesiredSizeChanged(desiredWidth, desiredHeight);
-		}
-
 		/**
 		 * set bitmap free release the bitmap resources
 		 */
 		@Override
 		public void onDestroy() {
-			// TODO Auto-generated method stub
 			super.onDestroy();
 			mDrawManager.onDestroy();
 			if (mTrackListLoader != null) {
 				mTrackListLoader.cancel(true);
 			}
-			isDestroyed = true;
 			mCurrentTrackIndex = 0;
 			mHandler.removeCallbacks(mDrawWaveFrameRunnable);
 			mHandler.removeCallbacks(mNextRun);
@@ -306,8 +254,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				int yPixelOffset) {
 			super.onOffsetsChanged(xOffset, yOffset, xOffsetStep, yOffsetStep,
 					xPixelOffset, yPixelOffset);
-
-			mDrawManager.setScrollOffset(xPixelOffset);
+			mDrawManager.setScrollOffset(xPixelOffset, xOffset);
 			drawWavePic();
 		}
 
@@ -321,27 +268,14 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		@Override
 		public void onSurfaceCreated(SurfaceHolder holder) {
-			/**
-			 * 
-			 */
 			holder.setFormat(PixelFormat.RGBA_8888);
-			// TODO Auto-generated method stub
 			super.onSurfaceCreated(holder);
 		}
 
 		@Override
 		public void onSurfaceDestroyed(SurfaceHolder holder) {
-			// TODO Auto-generated method stub
 			super.onSurfaceDestroyed(holder);
 			mHandler.removeCallbacks(mDrawWaveFrameRunnable);
-			// mHandlerTrack.removeCallbacks(mNextRun);
-
-		}
-
-		@Override
-		public void onSurfaceRedrawNeeded(SurfaceHolder holder) {
-			// TODO Auto-generated method stub
-			super.onSurfaceRedrawNeeded(holder);
 		}
 
 		@Override
@@ -354,10 +288,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		/**
 		 * the OnGestureListener Events to get the double tap feature
 		 */
-
 		@Override
 		public boolean onDown(MotionEvent arg0) {
-
 			return false;
 		}
 
@@ -376,7 +308,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				return false;
 			}
 			if (Math.abs(e2.getY()) - Math.abs(e2.getX()) > 180) {
-				if (enableDownloadFeature=true) {
+				if (enableDownloadFeature = true) {
 					Log.i(LOG_TAG,
 							" captured appropriate movement for new download ");
 					mHandler.removeCallbacks(mDrawWaveFrameRunnable);
@@ -385,26 +317,20 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 			}
 			return true;
-
 		}
 
 		@Override
 		public void onLongPress(MotionEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
 		public void onShowPress(MotionEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
@@ -414,8 +340,9 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		@Override
 		public void onVisibilityChanged(boolean visible) {
-			// TODO Auto-generated method stub
 			super.onVisibilityChanged(visible);
+			Log.i(LOG_TAG, "Preferences in OnVisibleChanged " + soundCloudUser );
+			
 			mVisible = visible;
 			if (mVisible) {
 				Log.i(LOG_TAG,
@@ -434,13 +361,14 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		@Override
 		public void setTouchEventsEnabled(boolean enabled) {
-			// TODO Auto-generated method stub
 			super.setTouchEventsEnabled(enabled);
 		}
 
 		public void setTracks(List<Tracks> result) {
 			tracks.clear();
-			tracks.addAll(result);
+			if (result != null) {
+				tracks.addAll(result);
+			}
 			mHandler.post(mNextRun);
 		}
 
@@ -466,18 +394,35 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		protected List<Tracks> doInBackground(Void... params) {
 			try {
 				Log.i(LOG_TAG, "loading the track information");
+				final int maxTrackCount = 5;
+				/*
+				 * in a real world app it would be necessary to create a bitmap
+				 * cache on the sd card
+				 */
+				/*
+				 * but for now i simply limit the number of tracks to keep in
+				 * memory
+				 */
 				List<Tracks> list = SoundCloudApi
 						.getMyWaveformUrl(SoundCloudApi.getApiWrapper());
-				for (Tracks track : list) {
+				List<Tracks> result = new ArrayList<Tracks>(maxTrackCount);
+				for (int i = 0; i < maxTrackCount && i < list.size(); i++) {
+					result.add(list.get(i));
+				}
+				for (Tracks track : result) {
+					int maxHeight = (int) (mSoundCloudWallpaperEngine
+							.getDesiredMinimumHeight() * 0.45);
+					maxHeight = Math.min(maxHeight,
+							track.waveFormURLPng.getHeight());
 					Bitmap scaled = Bitmap
 							.createScaledBitmap(track.waveFormURLPng,
 									mSoundCloudWallpaperEngine
 											.getDesiredMinimumWidth(),
-									track.waveFormURLPng.getHeight(), true);
+									maxHeight, true);
 					track.waveFormURLPng.recycle();
 					track.waveFormURLPng = scaled;
 				}
-				return list;
+				return result;
 
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.getMessage());

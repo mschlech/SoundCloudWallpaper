@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.soundcloud.challange"
+    package="com.example.soundcloud.challenge"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -30,23 +30,23 @@
 
         <service
             android:name=".SoundCloudLiveWallpaperService"
+            android:icon="@drawable/soundcloudlogo"
             android:label="@string/app_name"
-            android:permission="android.permission.BIND_WALLPAPER" 
-            android:icon="@drawable/soundcloudlogo">
+            android:permission="android.permission.BIND_WALLPAPER" >
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
             </intent-filter>
 
             <meta-data
                 android:name="android.service.wallpaper"
-                android:resource="@xml/soundcloudwallpaper"/>
+                android:resource="@xml/soundcloudwallpaper" />
         </service>
 
         <activity
             android:name=".SoundCloudWallpaperSettings"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Preferencestyle" >
+            android:theme="@style/PreferencesTheme"
+            android:label="@string/app_name" >
         </activity>
     </application>
 

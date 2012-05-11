@@ -5,7 +5,7 @@
         <item>get from my favorites</item>
     </string-array>
     <string-array name="sourcevalue">
-        <item>source</item>
-        <item>source</item>
+        <item>tracks</item>
+        <item>favorites</item>
     </string-array>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.soundcloud.challange.data;
+package com.example.soundcloud.challenge.data;
 
 import android.graphics.Bitmap;
 import android.os.Parcel;

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <style name="Preferencestyle">
-    <item name="android:windowBackground">@drawable/soundcloudlogochallange</item>
-    <item name="android:textColor">@android:color/black</item>    
-    
-    <!-- <item name="android:background">#FFEAEAEA</item> -->
-</style>
-    
+
+    <style name="PreferencesTheme">
+        <item name="android:windowBackground">@drawable/soundcloudpreference</item>
+        <item name="android:textColor">@android:color/black</item>
+
+        <!-- <item name="android:background">#FFEAEAEA</item> -->
+    </style>
+
 </resources>
