@@ -7,7 +7,8 @@ SoundCloudWallpaper
 ![HomeScreen](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudwallpaper1.png)
 A homescreen wiht the livewallpaper
 ![HomeScreen surfing on soundcloud wave](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudpressbelowTitle.png)
-sliding from one virtual screen to another following the waveform
+tapping on the title rotates the title, taping on the track owner fetches randomly the next track. Double tap invokes 
+a mimetype references app(like soundcloud app or browser)
  
 ## Dependencies
  * requires Android 2.3.3 
