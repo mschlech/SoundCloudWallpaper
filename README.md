@@ -5,9 +5,9 @@ SoundCloudWallpaper
 
 # Screenshots on a low end aldi mobile
 ![HomeScreen](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudwallpaper1.png)
-A homescreen wiht the livewallpaper
+A homescreen with the livewallpaper
 ![HomeScreen surfing on soundcloud wave](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudpressbelowTitle.png)
-tapping on the title rotates the title, taping on the track owner fetches randomly the next track. Double tap invokes 
+Tapping on the title rotates the title, tapping on the track owner fetches randomly the next track. Double tap invokes 
 a mimetype referenced app(like soundcloud app or browser)
  
 ## Dependencies
@@ -18,16 +18,16 @@ a mimetype referenced app(like soundcloud app or browser)
 
 ## Features
  
- * obtains the waveform png , track owner and track title via an java-api-wrapper  
+ * Obtains the waveform png , track owner and track title via an java-api-wrapper  
    [SoundCloud Java API wrapper (OAuth2 only)](https://github.com/soundcloud/java-api-wrapper) call against the soundcloud Live system.
- * the track will be selected randomly. The waveform png , the title and the owner will be displayed on the device
- * (not yet working) selectable source via preference to obtain all tracks or favorites of users soundcloud profile 
- * waveform png and additional track information changes from time to time or by a user interaction as described above. 
- * wipe to the next virtual screen of the device will show the next section of the waveform.
- * one tap gets randomly to the next track with its information.
- * double tap on the homescreen opens the displayed soundfile in a browser on (http://www.soundcloud.com)
+ * The track will be selected randomly. The waveform png , the title and the owner will be displayed on the device.
+ * (not yet working) selectable source via preference to obtain all tracks or favorites of users soundcloud profile. 
+ * Waveform png and additional track information changes from time to time or by a user interaction as described above. 
+ * Wipe to the next virtual screen of the device will show the next section of the waveform.
+ * One tap gets randomly to the next track with its information.
+ * Double tap on the homescreen opens the displayed soundfile in a browser on (http://www.soundcloud.com)
    or opens the soundcloud app if installed.
- * (preferences not yet working) Preferences to enable user initiated download swipe down the soundcloud logo.
+ * (Preferences not yet working) Preferences to enable user initiated download swipe down the soundcloud logo.
  
 
 ## Installation
@@ -35,10 +35,10 @@ a mimetype referenced app(like soundcloud app or browser)
    command line android tool or copying apk on the sdcard (which is not tested)
  
 ## Limitation
- * tracks being private cannot be invoked to passed to a subsequent intent ( browser or app invocation which has a different user ) which is ok, but it is not 
+ * Tracks being private cannot be invoked to passed to a subsequent intent ( browser or app invocation which has a different user ) which is ok, but it is not 
    blocked or notified upfront in the soundcloud wallpaper.
- * a limitation of 8 tracks to be kept in memory. (could be configured in the preferences)
- * preferences are not fully working yet. 
+ * A limitation of 8 tracks to be kept in memory. (could be configured in the preferences)
+ * Preferences are not fully working yet. 
 
 ### LiveWallpaper
 

@@ -159,8 +159,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		 * 
 		 */
 		private void getRandomTrack() {
-			Log.i(LOG_TAG, "next getRandomRunTask" + tracks.size());
-		
+			
 
 			if (tracks.size() != 0) {
 				Random randomWavForm = new Random();
@@ -298,10 +297,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 				float velocityY) {
-			Log.i(LOG_TAG,
-					"on fling captured X= " + e1.getX() + " Y= " + e2.getY()
-							+ " velocityX" + velocityX + " velocityY "
-							+ velocityY);
+		
 			/**
 			 * prevent download when dragging the system tray down
 			 */
