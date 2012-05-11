@@ -160,6 +160,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		 */
 		private void getRandomTrack() {
 			Log.i(LOG_TAG, "next getRandomRunTask" + tracks.size());
+		
+
 			if (tracks.size() != 0) {
 				Random randomWavForm = new Random();
 				int max = tracks.size() - 1;
@@ -394,7 +396,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		protected List<Tracks> doInBackground(Void... params) {
 			try {
 				Log.i(LOG_TAG, "loading the track information");
-				final int maxTrackCount = 5;
+				final int maxTrackCount = 8;
 				/*
 				 * in a real world app it would be necessary to create a bitmap
 				 * cache on the sd card

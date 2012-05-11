@@ -36,6 +36,7 @@ sliding from one virtual screen to another following the waveform
 ## Limitation
  * tracks being private cannot be invoked and passed to a subsequent intent ( browser or app invocation which has a different user ) which is ok, but it is not 
    blocked or notified upfront in the soundcloud wallpaper.
+ * a limitation of 8 tracks to be kept in memory. 
 
 ### LiveWallpaper
 
