@@ -8,8 +8,6 @@ SoundCloudWallpaper
 A homescreen wiht the livewallpaper
 ![HomeScreen surfing on soundcloud wave](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudpressbelowTitle.png)
 sliding from one virtual screen to another following the waveform
-![HomeScreen resource settings tracks or favorites](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudresourcesettings.png)
-setting manually the source where to get soundcloud content ( tracks/resource ) more to come.
  
 ## Dependencies
  * requires Android 2.3.3 
