@@ -29,7 +29,7 @@ a mimetype referenced app (like soundcloud app or browser)
  * One tap gets randomly to the next track with its information.
  * Double tap on the homescreen opens the displayed soundfile in a browser on (http://www.soundcloud.com)
    or opens the soundcloud app if installed.
- * (Preferences not yet working) Preferences to enable user initiated download swipe down the soundcloud logo.
+ * Preferences to enable user initiated download swipe down the soundcloud logo.
  
 
 ## Installation
@@ -39,9 +39,13 @@ a mimetype referenced app (like soundcloud app or browser)
 ## Limitation
  * Tracks being private cannot be invoked to passed to a subsequent intent (browser or app invocation which has a different user) which is ok, but it is not 
    blocked or notified upfront in the soundcloud wallpaper.
- * A limitation of 8 tracks to be kept in memory. (could be configured in the preferences)
+ * A limitation of 8 tracks to be kept in memory.
  * Preferences are not fully working yet. 
 
+## To come 
+ * image cache 
+ * configurable (via preference) limit of downloaded soundcloud entities (tracks/favorites)
+ 
 ### LiveWallpaper
 
 SoundCloudWallpaper is used like a standard wallpaper, installed and configured long press on the homescreen.
