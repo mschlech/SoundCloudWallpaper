@@ -424,7 +424,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				 * memory
 				 */
 				List<Tracks> list = SoundCloudApi
-						.getMyWaveformUrl(SoundCloudApi.getApiWrapper());
+						.getMyWaveformUrl(SoundCloudApi.getApiWrapper(), mSoundCloudWallpaperEngine.mDownloadLimit);
 				List<Tracks> result = new ArrayList<Tracks>(
 						mSoundCloudWallpaperEngine.mDownloadLimit);
 				for (int i = 0; i < mSoundCloudWallpaperEngine.mDownloadLimit

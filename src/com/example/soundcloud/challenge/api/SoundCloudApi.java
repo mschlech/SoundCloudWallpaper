@@ -206,7 +206,7 @@ public class SoundCloudApi {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<Tracks> getMyWaveformUrl(ApiWrapper apiWrapper) throws Exception {
+	public static List<Tracks> getMyWaveformUrl(ApiWrapper apiWrapper, int downloadLimit) throws Exception {
 
 		// ApiWrapper apiWrapper = getApiWrapper();
 
@@ -221,7 +221,7 @@ public class SoundCloudApi {
 		final Request requestResource = Request.to(resourceUrl.toString());
 
 		Log.e(LOG_TAG, "json Response" + requestResource.toUrl());
-		List<Tracks> trackList = new ArrayList<Tracks>();
+		List<Tracks> trackList = new ArrayList<Tracks>(downloadLimit);
 		try {
 
 			HttpResponse soundCloudResponse = apiWrapper.get(requestResource);
