@@ -97,6 +97,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		private String mSoundCloudPassword = "challenge123";
 		private String mSoundCloudSource = "tracks";
 		private boolean mEnableDownloadFeature = false;
+		private int mDownloadLimit = 8;
 
 		// false);
 
@@ -120,6 +121,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			mSoundCloudUser = mPrefs.getString("login", "mschlech");
 			mSoundCloudSource = mPrefs.getString("source", "tracks");
 			mEnableDownloadFeature = mPrefs.getBoolean("enableDownload", false);
+			mDownloadLimit = Integer.parseInt(mPrefs.getString("downloadlimit",
+					"8"));
 			new SoundCloudApi(mSoundCloudUser, mSoundCloudPassword,
 					mSoundCloudSource);
 		}
@@ -319,8 +322,9 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				return false;
 			}
 			if (Math.abs(e2.getY()) - Math.abs(e2.getX()) > 180) {
-				Log.i(LOG_TAG, "swipe iniated download " + mEnableDownloadFeature);
-				if (mEnableDownloadFeature) { 
+				Log.i(LOG_TAG, "swipe iniated download "
+						+ mEnableDownloadFeature);
+				if (mEnableDownloadFeature) {
 					Log.i(LOG_TAG,
 							" captured appropriate movement for new download ");
 					mHandler.removeCallbacks(mDrawWaveFrameRunnable);
@@ -408,8 +412,9 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		@Override
 		protected List<Tracks> doInBackground(Void... params) {
 			try {
-				Log.i(LOG_TAG, "loading the track information");
-				final int maxTrackCount = 8;
+				Log.i(LOG_TAG, "loading the track information "
+						+ mSoundCloudWallpaperEngine.mDownloadLimit);
+				final int maxTrackCount = mSoundCloudWallpaperEngine.mDownloadLimit;
 				/*
 				 * in a real world app it would be necessary to create a bitmap
 				 * cache on the sd card
@@ -420,8 +425,10 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				 */
 				List<Tracks> list = SoundCloudApi
 						.getMyWaveformUrl(SoundCloudApi.getApiWrapper());
-				List<Tracks> result = new ArrayList<Tracks>(maxTrackCount);
-				for (int i = 0; i < maxTrackCount && i < list.size(); i++) {
+				List<Tracks> result = new ArrayList<Tracks>(
+						mSoundCloudWallpaperEngine.mDownloadLimit);
+				for (int i = 0; i < mSoundCloudWallpaperEngine.mDownloadLimit
+						&& i < list.size(); i++) {
 					result.add(list.get(i));
 				}
 				for (Tracks track : result) {

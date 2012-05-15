@@ -42,13 +42,15 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 		downloadFeature.getSharedPreferences().getBoolean("enableDownload",
 				true);
 
-		
-		
+		Preference downloadLimit = getPreferenceScreen().findPreference(
+				"downloadlimit");
+
 		// Add the validator and listener on certain preferences
 		loginPreference.setOnPreferenceChangeListener(loginCheckListener);
 		passwordPreference.setOnPreferenceChangeListener(passwordChecker);
 		source.setOnPreferenceChangeListener(sourceListener);
 		downloadFeature.setOnPreferenceChangeListener(enableDownloadFeature);
+		downloadLimit.setOnPreferenceChangeListener(downloadLimitCheck);
 	}
 
 	@Override
@@ -75,7 +77,8 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 	Preference.OnPreferenceChangeListener passwordChecker = new OnPreferenceChangeListener() {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			Log.i("Preferences", " onPreferences password  Changed" + newValue.toString());
+			Log.i("Preferences",
+					" onPreferences password  Changed" + newValue.toString());
 			if (newValue != null && newValue.toString().length() > 0) {
 				return true;
 			}
@@ -90,7 +93,8 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 	Preference.OnPreferenceChangeListener loginCheckListener = new OnPreferenceChangeListener() {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			Log.i("Preferences", " onPreferences login Changed" + newValue.toString());
+			Log.i("Preferences",
+					" onPreferences login Changed" + newValue.toString());
 			if (newValue != null && newValue.toString().length() > 0) {
 				return true;
 			}
@@ -127,6 +131,21 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 			}
 			Toast.makeText(SoundCloudWallpaperSettings.this,
 					"You choose " + newValue.toString(), Toast.LENGTH_SHORT)
+					.show();
+			return false;
+		}
+
+	};
+	Preference.OnPreferenceChangeListener downloadLimitCheck = new OnPreferenceChangeListener() {
+		@Override
+		public boolean onPreferenceChange(Preference preference, Object newValue) {
+
+			if (newValue != null && newValue.toString().length() > 0 && newValue.toString().matches("\\d+")) {
+				preference.setSummary(newValue.toString());
+				return true;
+			}
+			Toast.makeText(SoundCloudWallpaperSettings.this,
+					"only digits" + newValue.toString() , Toast.LENGTH_SHORT)
 					.show();
 			return false;
 		}

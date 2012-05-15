@@ -22,7 +22,7 @@
     
     <PreferenceCategory
         android:key="soundcloudsource"
-        android:title="" >
+        android:title="Soundcloud data settings" >
         <CheckBoxPreference
             android:key="enableDownload"
             android:title="enable Download" >
