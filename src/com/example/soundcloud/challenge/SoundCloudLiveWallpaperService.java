@@ -21,6 +21,7 @@ import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.widget.Toast;
 
 import com.example.soundcloud.challenge.api.SoundCloudApi;
 import com.example.soundcloud.challenge.data.Tracks;
@@ -37,10 +38,29 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 	private Handler mHandler = new Handler();
 	public int mCurrentTrackIndex;
 
+	private boolean mLoginFirst = false;
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		Log.i(LOG_TAG, "Starting wallpaper service");
+
+	}
+
 	/**
 	 * offset for time bound reload / randomized displayed waveform png
 	 */
 	static long timeOffset = System.currentTimeMillis();
+
+	public SoundCloudLiveWallpaperService() {
+
+	}
+
+	/**
+	 * create the toast for login credentials and return true if user has set it
+	 * 
+	 * @return true if login credentials has been set
+	 */
 
 	@Override
 	public Engine onCreateEngine() {
@@ -57,19 +77,6 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 			SharedPreferences.OnSharedPreferenceChangeListener,
 			OnGestureListener {
 
-		private SharedPreferences mPrefs = PreferenceManager
-				.getDefaultSharedPreferences(SoundCloudLiveWallpaperService.this);
-
-		private String soundCloudUser = mPrefs.getString("login", "mschlech");
-
-		private String soundCloudPassword = mPrefs.getString("password",
-				"linus123");
-
-		private String soundCloudSource = mPrefs.getString("source", "tracks");
-
-		private boolean enableDownloadFeature = mPrefs.getBoolean(
-				"enableDownload", false);
-
 		private TrackListLoader mTrackListLoader;
 
 		private boolean mVisible;
@@ -84,30 +91,37 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 
 		private boolean mIsUpdating = true;
 
+		SharedPreferences mPrefs;
+
+		private String mSoundCloudUser = "challenge";
+		private String mSoundCloudPassword = "challenge123";
+		private String mSoundCloudSource = "tracks";
+		private boolean mEnableDownloadFeature = false;
+
+		// false);
+
 		SoundCloudWallpaperEngine() {
-			mApiWrapper = new SoundCloudApi(soundCloudUser, soundCloudPassword,
-					soundCloudSource);
+			Log.i(LOG_TAG,
+					"in constructor onSharedPreferenceListener has changed ");
+			mApiWrapper = new SoundCloudApi(mSoundCloudUser,
+					mSoundCloudPassword, mSoundCloudSource);
+			mPrefs = SoundCloudLiveWallpaperService.this.getSharedPreferences(
+					SOUNDCLOUD_SETTINGS, 0);
 			mPrefs.registerOnSharedPreferenceChangeListener(this);
 			onSharedPreferenceChanged(mPrefs, null);
+
 		}
 
 		@Override
 		public void onSharedPreferenceChanged(
 				SharedPreferences sharedPreferences, String key) {
-
-			Log.i(LOG_TAG, " Shared Preferences changed ");
-			/**
-			 * which service to fetch user tracks or user favorites
-			 */
-			soundCloudUser = sharedPreferences
-					.getString("login", "mschlech123");
-			soundCloudPassword = sharedPreferences.getString("password",
-					"linus123");
-			soundCloudSource = sharedPreferences.getString("source", "tracks");
-			enableDownloadFeature = sharedPreferences.getBoolean("enableDownload", false);
-			mCurrentTrackIndex = 0;
-			Log.i(LOG_TAG, "On Preference changed =>" + soundCloudUser);
-			drawWavePic();
+			Log.i(LOG_TAG, "onSharedPreference changed now ");
+			mSoundCloudPassword = mPrefs.getString("password", "linus123");
+			mSoundCloudUser = mPrefs.getString("login", "mschlech");
+			mSoundCloudSource = mPrefs.getString("source", "tracks");
+			mEnableDownloadFeature = mPrefs.getBoolean("enableDownload", false);
+			new SoundCloudApi(mSoundCloudUser, mSoundCloudPassword,
+					mSoundCloudSource);
 		}
 
 		public void scheduleDraw() {
@@ -159,7 +173,6 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		 * 
 		 */
 		private void getRandomTrack() {
-			
 
 			if (tracks.size() != 0) {
 				Random randomWavForm = new Random();
@@ -297,7 +310,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 				float velocityY) {
-		
+
 			/**
 			 * prevent download when dragging the system tray down
 			 */
@@ -306,7 +319,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				return false;
 			}
 			if (Math.abs(e2.getY()) - Math.abs(e2.getX()) > 180) {
-				if (enableDownloadFeature = true) {
+				if (mEnableDownloadFeature = true) {
 					Log.i(LOG_TAG,
 							" captured appropriate movement for new download ");
 					mHandler.removeCallbacks(mDrawWaveFrameRunnable);
@@ -339,14 +352,17 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		@Override
 		public void onVisibilityChanged(boolean visible) {
 			super.onVisibilityChanged(visible);
-			Log.i(LOG_TAG, "Preferences in OnVisibleChanged " + soundCloudUser );
-			
+			Log.i(LOG_TAG, "Preferences in OnVisibleChanged " + mSoundCloudUser);
+
 			mVisible = visible;
 			if (mVisible) {
 				Log.i(LOG_TAG,
 						"onVisibilityChanged is true so invoke the drawWavePic method");
 				mIsUpdating = true;
-
+				Log.i(LOG_TAG, "soundcloud User =" + mSoundCloudUser
+						+ " soundcloud password =							" + mSoundCloudPassword);
+				mHandler.removeCallbacks(mDrawWaveFrameRunnable);
+				new TrackListLoader(this).execute();
 				drawWavePic();
 				mHandler.removeCallbacks(mNextRun);
 				mHandler.post(mNextRun);

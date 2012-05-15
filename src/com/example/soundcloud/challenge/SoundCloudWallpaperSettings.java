@@ -73,7 +73,7 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 	Preference.OnPreferenceChangeListener passwordChecker = new OnPreferenceChangeListener() {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			Log.i("Preferences", " onPreferences Changed");
+			Log.i("Preferences", " onPreferences password  Changed" + newValue.toString());
 			if (newValue != null && newValue.toString().length() > 0) {
 				return true;
 			}
@@ -88,7 +88,7 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 	Preference.OnPreferenceChangeListener loginCheckListener = new OnPreferenceChangeListener() {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			Log.i("Preferences", " onPreferences Changed");
+			Log.i("Preferences", " onPreferences login Changed" + newValue.toString());
 			if (newValue != null && newValue.toString().length() > 0) {
 				return true;
 			}
