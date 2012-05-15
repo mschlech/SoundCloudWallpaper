@@ -9,7 +9,8 @@ A homescreen with the livewallpaper
 ![HomeScreen surfing on soundcloud wave](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudpressbelowTitle.png)
 Tapping on the title rotates the title, tapping on the track owner fetches randomly the next track. Double tap invokes 
 a mimetype referenced app (like soundcloud app or browser)
- 
+![HomeScreen surfing on soundcloud wave](https://github.com/mschlech/SoundCloudWallpaper/raw/master/pics/soundcloudresourcesettings.png)
+some preferences , like changing account and download behavior 
  
  
 ## Dependencies
