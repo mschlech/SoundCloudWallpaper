@@ -42,6 +42,8 @@ public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 		downloadFeature.getSharedPreferences().getBoolean("enableDownload",
 				true);
 
+		
+		
 		// Add the validator and listener on certain preferences
 		loginPreference.setOnPreferenceChangeListener(loginCheckListener);
 		passwordPreference.setOnPreferenceChangeListener(passwordChecker);

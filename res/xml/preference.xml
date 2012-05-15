@@ -4,23 +4,29 @@
     <PreferenceCategory
         android:key="soundcloudcredentials"
         android:title="sound cloud network credentials" >
-        <CheckBoxPreference
-            android:key="enableDownload"
-            android:title="enable Download" >
-        </CheckBoxPreference>
 
         <EditTextPreference
-            android:defaultValue="mschlech"
+            android:defaultValue="challenge"
             android:dialogIcon="@drawable/soundcloudlogo"
             android:key="login"
             android:title="login" >
         </EditTextPreference>
         <EditTextPreference
-            android:defaultValue="linus123"
+            android:defaultValue="challenge123"
             android:dialogIcon="@drawable/soundcloudlogo"
             android:key="password"
             android:title="Password" >
         </EditTextPreference>
+        
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+        android:key="soundcloudsource"
+        android:title="" >
+        <CheckBoxPreference
+            android:key="enableDownload"
+            android:title="enable Download" >
+        </CheckBoxPreference>
         
        
          <ListPreference
@@ -32,32 +38,14 @@
             android:entries="@array/sourcekey"
             android:dialogTitle="show favorites or tracks?"
              />
-    </PreferenceCategory>
-    <!--
-    <PreferenceCategory
-        android:key="soundcloudsource"
-        android:title="soundcloud data source" >
-
-        
-        <EditTextPreference
-            android:defaultValue="tracks"
+          <EditTextPreference
+            android:defaultValue="8"
             android:dialogIcon="@drawable/soundcloudlogo"
-            android:key="source"
-            android:summary="set the resource name from which sound cloud resource to fetch the data"
-            android:title="resource name of sound cloud" >
+            android:key="downloadlimit"
+            android:title="downloadlimit" >
         </EditTextPreference>
-        -->
-
-       <!--  <ListPreference
-            android:defaultValue="tracks"
-            android:dialogIcon="@drawable/soundcloudlogo"
-            android:dialogMessage="favorites or tracks"
-            android:dialogTitle="source"
-            android:entries="@array/sourceValue"
-            android:entryValues="@array/sourceKey"
-            android:key="source"
-            android:summary="set the resource name from which sound cloud resource to fetch the data"
-            android:title="tracks or favorites" />
+     
+     
     </PreferenceCategory> -->
 
 </PreferenceScreen>
