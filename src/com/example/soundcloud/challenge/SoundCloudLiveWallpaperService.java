@@ -319,7 +319,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				return false;
 			}
 			if (Math.abs(e2.getY()) - Math.abs(e2.getX()) > 180) {
-				if (mEnableDownloadFeature = true) {
+				Log.i(LOG_TAG, "swipe iniated download " + mEnableDownloadFeature);
+				if (mEnableDownloadFeature) { 
 					Log.i(LOG_TAG,
 							" captured appropriate movement for new download ");
 					mHandler.removeCallbacks(mDrawWaveFrameRunnable);
