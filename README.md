@@ -41,11 +41,9 @@ some preferences , like changing account and download behavior
  * Tracks being private cannot be invoked to passed to a subsequent intent (browser or app invocation which has a different user) which is ok, but it is not 
    blocked or notified upfront in the soundcloud wallpaper.
  * A limitation of 8 tracks to be kept in memory.
- * Preferences are not fully working yet. 
 
 ## To come 
  * image cache 
- * configurable (via preference) limit of downloaded soundcloud entities (tracks/favorites)
  
 ### LiveWallpaper
 
