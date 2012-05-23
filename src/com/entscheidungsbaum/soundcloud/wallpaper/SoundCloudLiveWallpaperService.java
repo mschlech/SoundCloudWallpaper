@@ -27,7 +27,7 @@ import com.entscheidungsbaum.soundcloud.wallpaper.data.Tracks;
 /**
  * 
  * @author marcus
- * 
+ * entscheidungsbaum 
  */
 public class SoundCloudLiveWallpaperService extends WallpaperService {
 

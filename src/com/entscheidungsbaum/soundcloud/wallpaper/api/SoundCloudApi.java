@@ -29,7 +29,7 @@ import com.soundcloud.api.Token;
 
 /**
  * @author marcus
- * 
+ * entscheidungsbaum
  */
 public class SoundCloudApi {
 
@@ -37,8 +37,7 @@ public class SoundCloudApi {
 
 	final static String CLIENT_ID = "d8e6ffc58ae1a231a7f1847cf695adb2";
 	final static String CLIENT_SECRET = "e9aa7b6b56d9d5056af5fe220749a62a";
-	// private static String username = "mschlech";
-	// private static String passwd = "linus123";
+	
 	static String mUsername;
 	static String mPassword;
 	static String mSource;

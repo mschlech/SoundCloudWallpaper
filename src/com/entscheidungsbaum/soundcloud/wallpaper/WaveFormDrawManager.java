@@ -35,7 +35,7 @@ import com.nineoldandroids.animation.ObjectAnimator;
 /**
  * 
  * @author marcus
- * 
+ * entscheidungsbaum
  */
 public class WaveFormDrawManager implements AnimatorListener {
 

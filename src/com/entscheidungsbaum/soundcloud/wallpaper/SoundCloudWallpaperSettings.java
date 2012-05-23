@@ -13,7 +13,7 @@ import android.widget.Toast;
 /**
  * 
  * @author marcus
- * 
+ * entscheidungsbaum
  */
 public class SoundCloudWallpaperSettings extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
