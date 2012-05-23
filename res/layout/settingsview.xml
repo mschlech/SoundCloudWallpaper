@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/date_detail_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/soundcloudlogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your name" />
+
+    <EditText
+        android:id="@+id/soundcloudloginenter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:imeOptions="actionDone"
+        android:inputType="text" />
+
+    <TextView
+        android:id="@+id/soundcloudpassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/soundcloudlogin"
+        android:text="Your name" />
+
+    <EditText
+        android:id="@+id/soundcloudpasswordenter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/soundcloudlogin"
+        android:imeOptions="actionDone"
+        android:inputType="textPassword" />
+
+</RelativeLayout>
