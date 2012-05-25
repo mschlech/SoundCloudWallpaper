@@ -30,7 +30,7 @@ import com.entscheidungsbaum.soundcloud.wallpaper.data.Tracks;
  */
 public class SoundCloudLiveWallpaperService extends WallpaperService {
 
-	final String LOG_TAG = "SoundCloudLiveWallpaperActivity";
+	final String LOG_TAG = "SoundCloudLiveWallpaperService";
 	public static final String SOUNDCLOUD_SETTINGS = "preferences";
 	private Handler mHandler = new Handler();
 	public int mCurrentTrackIndex;
@@ -114,8 +114,8 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		public void onSharedPreferenceChanged(
 				SharedPreferences sharedPreferences, String key) {
 			Log.i(LOG_TAG, "onSharedPreference changed now ");
-			mSoundCloudPassword = mPrefs.getString("password", "linus123");
-			mSoundCloudUser = mPrefs.getString("login", "mschlech");
+			mSoundCloudPassword = mPrefs.getString("password", "challenge123");
+			mSoundCloudUser = mPrefs.getString("login", "challenge1");
 			mSoundCloudSource = mPrefs.getString("source", "tracks");
 			mEnableDownloadFeature = mPrefs.getBoolean("enableDownload", false);
 			mDownloadLimit = Integer.parseInt(mPrefs.getString("downloadlimit",
