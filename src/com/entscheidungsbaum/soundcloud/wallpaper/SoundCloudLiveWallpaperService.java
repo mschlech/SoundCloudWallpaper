@@ -26,8 +26,7 @@ import com.entscheidungsbaum.soundcloud.wallpaper.data.Tracks;
 
 /**
  * 
- * @author marcus
- * entscheidungsbaum 
+ * @author marcus entscheidungsbaum
  */
 public class SoundCloudLiveWallpaperService extends WallpaperService {
 
@@ -65,7 +64,7 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 		try {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e(LOG_TAG, "Exception occured could not create engine");
 		}
 		mCurrentTrackIndex = 0;
 		return new SoundCloudWallpaperEngine();
@@ -421,8 +420,9 @@ public class SoundCloudLiveWallpaperService extends WallpaperService {
 				 * but for now i simply limit the number of tracks to keep in
 				 * memory
 				 */
-				List<Tracks> list = SoundCloudApi
-						.getMyWaveformUrl(SoundCloudApi.getApiWrapper(), mSoundCloudWallpaperEngine.mDownloadLimit);
+				List<Tracks> list = SoundCloudApi.getMyWaveformUrl(
+						SoundCloudApi.getApiWrapper(),
+						mSoundCloudWallpaperEngine.mDownloadLimit);
 				List<Tracks> result = new ArrayList<Tracks>(
 						mSoundCloudWallpaperEngine.mDownloadLimit);
 				for (int i = 0; i < mSoundCloudWallpaperEngine.mDownloadLimit
